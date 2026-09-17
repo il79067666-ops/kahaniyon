@@ -4,26 +4,26 @@
   "display": "standalone",
   "name": "Kahaniyon Chat Story",
   "orientation": "portrait-primary",
-  "scope": "/kahaniyon/",
+  "scope": "/",
   "short_name": "Kahaniyon",
-  "start_url": "/kahaniyon/index.html",
+  "start_url": "/index.html",
   "theme_color": "#0F0B08",
   "description": "Apni kahaniyon ki duniya mein AI ke saath baat karo",
   "icons": [
     {
-      "src": "/kahaniyon/icon-192.png",
+      "src": "/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "/kahaniyon/icon-512.png",
+      "src": "/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
     },
     {
-      "src": "/kahaniyon/icon-2.svg",
+      "src": "/icon-2.svg",
       "type": "image/svg+xml",
       "sizes": "any",
       "purpose": "any"
