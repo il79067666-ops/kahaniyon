@@ -6,7 +6,7 @@
   "orientation": "portrait-primary",
   "scope": "/kahaniyon/",
   "short_name": "Kahaniyon",
-  "start_url": "/kahaniyon/",
+  "start_url": "/kahaniyon/index.html",
   "theme_color": "#0F0B08",
   "description": "Apni kahaniyon ki duniya mein AI ke saath baat karo",
   "icons": [
