@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="screen-orientation" content="portrait">
+<title>Kahaniyon Chat Story</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0F0B08">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F0B08;
+    --panel:#1C1610;
+    --panel-2:#251E15;
+    --gold:#D4AF37;
+    --gold-soft:#E9CE7A;
+    --rose:#B33A45;
+    --text:#F3ECDD;
+    --text-muted:#9C917D;
+    --border:#332A1D;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    overflow:hidden;
+  }
+  h1,h2,h3,.serif{ font-family:'Fraunces',serif; }
+  button{ cursor:pointer; font-family:inherit; }
+  img{ -webkit-user-drag:none; }
+
+  .screen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    transform:translateX(100%);
+    transition:transform .3s ease;
+    background:var(--bg);
+  }
+  #homeScreen{ transform:translateX(0); }
+  body.chat-open #chatScreen{ transform:translateX(0); }
+  body.profile-open #profileScreen{ transform:translateX(0); }
+
+  /* ---------- HOME ---------- */
+  #homeScreen > header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 16px 0;
+  }
+  .brand{ font-family:'Fraunces',serif; font-weight:700; font-size:24px; color:var(--gold-soft); user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; padding:4px 0; }
+  .profileBtn{
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--border); background:var(--panel-2);
+    color:var(--gold-soft); display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-size:15px;
+  }
+  #tabs{
+    display:flex; gap:22px;
+    padding:16px 16px 10px;
+    border-bottom:1px solid var(--border);
+    overflow-x:auto;
+  }
+  .tab{
+    background:none; border:none; color:var(--text-muted);
+    font-size:15px; font-weight:600; padding-bottom:10px;
+    white-space:nowrap; position:relative;
+  }
+  .tab.active{ color:var(--text); }
+  .tab.active::after{
+    content:''; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+    background:var(--rose); border-radius:2px;
+  }
+  #homeBody{ flex:1; overflow-y:auto; padding-bottom:90px; }
+
+  .heroCard{
+    position:relative;
+    margin:16px;
+    border-radius:20px;
+    overflow:hidden;
+    aspect-ratio: 3/4;
+    display:flex; align-items:flex-end;
+  }
+  .heroCard .heroBg{
+    position:absolute; inset:0;
+    display:flex;
+  }
+  .heroCard .heroBg > div{ flex:1; }
+  .heroCard .heroShade{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,.85) 0%, rgba(0,0,0,.15) 45%, rgba(0,0,0,.35) 100%);
+  }
+  .heroCard .heroText{
+    position:relative; z-index:2;
+    padding:20px;
+    width:100%;
+  }
+  .heroCard .heroText p.kicker{
+    margin:0 0 4px; font-size:12px; letter-spacing:.06em; color:var(--gold-soft); text-transform:uppercase;
+  }
+  .heroCard .heroText h2{
+    margin:0 0 6px; font-size:26px; line-height:1.15; color:white;
+  }
+  .heroCard .heroText .desc{
+    font-size:13px; color:#E8DFCB; margin-bottom:14px; max-width:30ch;
+  }
+  .startChatBtn{
+    width:100%;
+    background:rgba(255,255,255,.14);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.35);
+    color:white;
+    padding:13px;
+    border-radius:12px;
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:.03em;
+  }
+
+  #sectionTitle{
+    font-size:19px; font-weight:700; margin:22px 16px 12px;
+  }
+  #continueRow{
+    display:flex; gap:14px; overflow-x:auto; padding:0 16px 8px;
+  }
+  .contItem{ flex:none; width:78px; text-align:center; }
+  .contItem .ring{
+    width:70px; height:70px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-size:24px; color:#161009;
+    margin:0 auto 6px;
+    border:2px solid var(--rose);
+    position:relative;
+  }
+  .contItem .ring .dot{
+    position:absolute; top:2px; right:2px;
+    width:10px; height:10px; border-radius:50%; background:var(--rose);
+    border:2px solid var(--bg);
+  }
+  .contItem p{ margin:0; font-size:11.5px; color:var(--text-muted); line-height:1.25; }
+
+  #grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:14px;
+    padding:0 16px;
+  }
+  .gridCard{
+    border-radius:16px;
+    overflow:hidden;
+    aspect-ratio:3/4;
+    position:relative;
+    display:flex; align-items:flex-end;
+    border:1px solid var(--border);
+  }
+  .gridCard .gcBg{ position:absolute; inset:0; }
+  .gridCard .gcShade{
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.1) 55%);
+  }
+  .gridCard .gcText{ position:relative; z-index:2; padding:12px; width:100%; }
+  .gridCard .gcText .genre{
+    font-size:10px; color:var(--gold-soft); text-transform:uppercase; letter-spacing:.04em;
+  }
+  .gridCard .gcText h4{ margin:2px 0 0; font-size:14.5px; color:white; line-height:1.25; }
+
+  /* ---------- BOTTOM NAV ---------- */
+  #bottomNav{
+    position:fixed; left:0; right:0; bottom:0;
+    display:flex;
+    background:var(--panel);
+    border-top:1px solid var(--border);
+    padding:10px 0 14px;
+    z-index:10;
+  }
+  #bottomNav button{
+    flex:1; background:none; border:none; color:var(--text-muted);
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-size:11px;
+  }
+  #bottomNav button.active{ color:var(--gold-soft); }
+  #bottomNav .icon{ font-size:19px; }
+
+  /* ---------- CHAT SCREEN ---------- */
+  #chatHeader{
+    display:flex; align-items:center; gap:12px;
+    padding:16px;
+    border-bottom:1px solid var(--border);
+    background:var(--panel);
+  }
+  #backBtn{ background:none; border:none; color:var(--text); font-size:20px; padding:4px 8px 4px 0; }
+  #chatMenuBtn{ margin-left:auto; background:none; border:none; color:var(--text); font-size:22px; padding:4px 10px; }
+  #chatMenuDropdown{
+    display:none; position:absolute; top:56px; right:12px; z-index:20;
+    background:var(--panel-2); border:1px solid var(--border); border-radius:14px;
+    padding:6px; min-width:170px; box-shadow:0 8px 24px rgba(0,0,0,.4);
+  }
+  #chatMenuDropdown.show{ display:block; }
+  #chatMenuDropdown button{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    color:var(--text); padding:11px 12px; font-size:14px; border-radius:8px;
+  }
+  #chatMenuDropdown button.danger{ color:#E06B6B; }
+  .avatar{
+    flex:none; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; color:#161009;
+  }
+  #chatHeader{ position:relative; }
+  #chatHeader .avatar{ width:38px; height:38px; font-size:15px; }
+  #chatHeader .who h3{ margin:0; font-size:16px; }
+  #chatHeader .who p{ margin:0; font-size:12px; color:var(--text-muted); }
+
+  #messages{ flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; }
+  .bubble{
+    max-width:80%; padding:11px 15px; border-radius:16px; margin:5px 0;
+    line-height:1.5; font-size:15px; white-space:pre-wrap; word-wrap:break-word;
+  }
+  .bubble.user{ align-self:flex-end; background:#1C5D8C; color:#FFFFFF; border-bottom-right-radius:4px; }
+  .bubble.ai{ align-self:flex-start; background:#2A2A2A; color:#E8E8E8; border-bottom-left-radius:4px; }
+  .bubble.error{ align-self:flex-start; background:#3A1E1E; color:#F0B4B4; border-bottom-left-radius:4px; }
+  .bubble.ai.loading{ color:var(--text-muted); font-style:italic; padding:14px 18px; }
+  .typingDots{ display:inline-flex; gap:4px; align-items:center; }
+  .typingDots span{
+    width:7px; height:7px; border-radius:50%; background:var(--text-muted);
+    animation:typingBounce 1.2s infinite ease-in-out;
+  }
+  .typingDots span:nth-child(2){ animation-delay:0.15s; }
+  .typingDots span:nth-child(3){ animation-delay:0.3s; }
+  @keyframes typingBounce{
+    0%, 60%, 100%{ transform:translateY(0); opacity:0.5; }
+    30%{ transform:translateY(-5px); opacity:1; }
+  }
+
+  #chatToolbar{ display:flex; gap:8px; padding:8px 12px; background:var(--panel); border-top:1px solid var(--border); }
+  #chatToolbar button{
+    flex:1; background:var(--panel-2); border:1px solid var(--border); color:var(--text-muted);
+    border-radius:12px; padding:9px; font-size:12.5px;
+  }
+
+  #inputBar{ display:flex; align-items:center; gap:8px; padding:12px; background:var(--panel); border-top:1px solid var(--border); }
+  #inputWrap{ flex:1; position:relative; display:flex; align-items:center; }
+  #userInput{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:22px; padding:12px 44px 12px 16px; font-size:15px; outline:none;
+  }
+  #suggestBtn{
+    position:absolute; right:4px; width:34px; height:34px; border-radius:50%;
+    border:none; background:none; color:var(--gold-soft);
+    font-size:17px; display:flex; align-items:center; justify-content:center;
+  }
+  #micBtn, #sendBtn{
+    flex:none; width:42px; height:42px; border-radius:50%;
+    border:1px solid var(--border); background:var(--panel-2); color:var(--gold-soft);
+    font-size:17px; display:flex; align-items:center; justify-content:center;
+  }
+  #micBtn.recording{ background:var(--rose); color:white; border-color:var(--rose); }
+  #sendBtn{ background:var(--gold); color:#1A1409; border:none; font-size:18px; padding-left:3px; }
+  #sendBtn:disabled{ opacity:.5; }
+  #micBtn.hide, #sendBtn.hide{ display:none; }
+
+  /* ---------- PROFILE ---------- */
+  #profileScreen header{ display:flex; align-items:center; gap:12px; padding:16px; border-bottom:1px solid var(--border); background:var(--panel); }
+  #profileScreen header h3{ margin:0; font-size:17px; }
+  #profileBody, #profileDetailsBody, #accountBody{ padding:24px 20px; overflow-y:auto; }
+  .bigAvatar{
+    width:64px; height:64px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-size:26px; color:#161009; background:var(--gold);
+  }
+  #profileUserRow{ display:flex; align-items:center; gap:16px; margin-bottom:22px; }
+  #profileUserRow h2{ margin:0 0 4px; font-size:20px; }
+  #profileUserRow p{ margin:0; font-size:13px; color:var(--text-muted); }
+  #profileDetailsScreen .bigAvatar{ width:88px; height:88px; font-size:34px; margin:0 auto 20px; }
+  #planCard{
+    background:var(--panel); border:1px solid var(--border); border-radius:16px;
+    padding:16px; margin-bottom:26px;
+  }
+  #planCardTop{ display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; margin-bottom:12px; border-bottom:1px solid var(--border); }
+  #planName{ font-weight:700; font-size:14px; color:var(--gold-soft); letter-spacing:.03em; }
+  #planStatus{ font-size:12px; color:#6FCF6F; font-weight:600; }
+  .planRow{ display:flex; justify-content:space-between; font-size:13.5px; color:var(--text-muted); padding:6px 0; }
+  .planRow span:last-child{ color:var(--text); }
+  #manageSubBtn{
+    width:100%; margin-top:10px; background:none; border:1px solid var(--border);
+    color:var(--text); border-radius:12px; padding:12px; font-weight:600; font-size:14px;
+  }
+  .settingsHeading{ margin:0 0 8px; font-size:14px; color:var(--text-muted); font-weight:700; }
+  .settingsList{ border-top:1px solid var(--border); }
+  .settingsRow{
+    display:flex; align-items:center; gap:14px; padding:14px 2px;
+    border-bottom:1px solid var(--border);
+  }
+  .settingsRow span:first-child{ font-size:17px; flex:none; width:22px; text-align:center; }
+  .settingsRow p{ margin:0; flex:1; font-size:14.5px; }
+  .settingsRow .chev{ color:var(--text-muted); font-size:18px; }
+  #profileFooter{ text-align:center; font-size:12px; color:var(--text-muted); margin-top:26px; }
+  .colorRow{ display:flex; gap:10px; justify-content:center; margin-bottom:24px; }
+  .colorDot{ width:30px; height:30px; border-radius:50%; border:2px solid transparent; }
+  .colorDot.selected{ border-color:var(--text); }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px; }
+  .field input{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:12px; padding:12px 14px; font-size:15px; outline:none;
+  }
+  #saveProfileBtn{ width:100%; background:var(--gold); color:#1A1409; border:none; border-radius:14px; padding:13px; font-weight:700; font-size:15px; }
+  #notifStatus{
+    padding:12px 14px; background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; font-size:13px; color:var(--text-muted);
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  #notifStatus button{ background:none; border:1px solid var(--gold); color:var(--gold-soft); border-radius:12px; padding:6px 12px; font-size:12px; flex:none; }
+
+  /* ---------- TOAST ---------- */
+  #toast{
+    position:fixed; left:16px; right:16px; bottom:-100px;
+    background:var(--panel-2); border:1px solid var(--gold); border-radius:14px;
+    padding:12px 16px; display:flex; align-items:center; gap:10px;
+    transition:bottom .3s ease; z-index:50;
+  }
+  #toast.show{ bottom:90px; }
+  #toast .avatar{ width:32px; height:32px; font-size:13px; }
+  #toast .msg{ font-size:13px; color:var(--text); flex:1; }
+  #toast .msg b{ color:var(--gold-soft); }
+
+
+  /* ---------- SEARCH / CHATS LIST SCREENS ---------- */
+  #searchScreen, #chatsListScreen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    background:var(--bg);
+    transform:translateX(100%);
+    transition:transform .3s ease;
+    z-index:6;
+  }
+  body.search-open #searchScreen{ transform:translateX(0); }
+  body.chatslist-open #chatsListScreen{ transform:translateX(0); }
+  .simpleHeader{
+    display:flex; align-items:center; gap:10px;
+    padding:16px;
+    border-bottom:1px solid var(--border);
+    background:var(--panel);
+  }
+  .simpleHeader .backX{ background:none; border:none; color:var(--text); font-size:20px; }
+  .simpleHeader h2{ margin:0; font-size:19px; flex:1; }
+  #searchInputWrap{ padding:12px 16px; border-bottom:1px solid var(--border); background:var(--panel); }
+  #searchInput{
+    width:100%;
+    background:var(--panel-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:14px;
+    padding:12px 16px;
+    font-size:15px;
+    outline:none;
+  }
+  #searchResults, #chatsListBody{
+    flex:1;
+    overflow-y:auto;
+    padding:8px 16px 100px;
+  }
+  .resultRow{
+    display:flex; align-items:center; gap:14px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--border);
+  }
+  .resultRow .avatar{ width:50px; height:50px; font-size:19px; flex:none; }
+  .resultRow .info{ flex:1; min-width:0; }
+  .resultRow .info h4{ margin:0 0 3px; font-size:15.5px; }
+  .resultRow .info p{ margin:0; font-size:12.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .resultRow .unreadBadge{
+    flex:none; width:9px; height:9px; border-radius:50%; background:var(--rose);
+  }
+  .emptyState{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:14px;
+    padding:60px 24px;
+    line-height:1.6;
+  }
+
+  /* ---------- CREATE CHARACTER TILE + SCREEN ---------- */
+  /* Sirf admin mode mein dikhne wali cheezein (character banana, photo badalna) */
+  .adminOnly{ display:none !important; }
+  body.admin-mode .adminOnly{ display:flex !important; }
+  body.admin-mode .gridCard .adminOnly{ display:flex !important; }
+
+  .createTile{
+    border-radius:16px;
+    aspect-ratio:3/4;
+    border:2px dashed var(--border);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:8px; color:var(--text-muted);
+    background:var(--panel-2);
+  }
+  .createTile .plus{ font-size:30px; color:var(--gold-soft); line-height:1; }
+  .createTile span{ font-size:12.5px; text-align:center; padding:0 10px; }
+
+  #createScreen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    background:var(--bg);
+    transform:translateX(100%);
+    transition:transform .3s ease;
+    z-index:7;
+  }
+  body.create-open #createScreen{ transform:translateX(0); }
+  #profileDetailsScreen, #accountScreen, #infoScreen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    background:var(--bg);
+    transform:translateX(100%);
+    transition:transform .3s ease;
+    z-index:15;
+  }
+  body.profile-details-open #profileDetailsScreen{ transform:translateX(0); }
+  body.account-open #accountScreen{ transform:translateX(0); }
+  body.info-open #infoScreen{ transform:translateX(0); }
+  #infoBody{ flex:1; overflow-y:auto; padding:20px; font-size:14.5px; line-height:1.8; color:var(--text-muted); }
+  #infoBody h4{ color:var(--text); margin:18px 0 6px; font-size:15px; }
+  #infoBody h4:first-child{ margin-top:0; }
+  #infoBody a{ color:var(--gold-soft); }
+
+  /* ---------- PHOTO CHOICE SHEETS ---------- */
+  #photoChoiceOverlay, #linkInputOverlay{
+    position:fixed; inset:0; z-index:60;
+    background:rgba(0,0,0,.6);
+    display:none; align-items:flex-end;
+  }
+  #photoChoiceOverlay.show, #linkInputOverlay.show{ display:flex; }
+  #photoChoiceSheet, #linkInputSheet{
+    width:100%; background:var(--panel); border-top:1px solid var(--border);
+    border-radius:20px 20px 0 0; padding:20px; padding-bottom:34px;
+  }
+  .sheetTitle{ margin:0 0 16px; font-size:16px; font-weight:700; text-align:center; }
+  #photoChoiceSheet button, #linkInputSheet button{
+    width:100%; text-align:left; background:var(--panel-2); border:1px solid var(--border);
+    color:var(--text); border-radius:14px; padding:14px 16px; font-size:14.5px;
+    margin-bottom:10px;
+  }
+  #photoChoiceSheet button small, #linkInputSheet button small{ display:block; color:var(--text-muted); font-size:11.5px; margin-top:2px; }
+  #photoChoiceSheet .cancelBtn, #linkInputSheet .cancelBtn{
+    text-align:center; background:none; border:none; color:var(--text-muted); margin-bottom:0; margin-top:2px;
+  }
+  #linkUrlInput{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:14px; padding:13px 16px; font-size:15px; outline:none; margin-bottom:12px;
+  }
+  #linkInputSheet #linkSaveBtn{ background:var(--gold); color:#1A1409; font-weight:700; text-align:center; }
+  #createBody{ flex:1; overflow-y:auto; padding:20px; }
+  #createBody .field textarea{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:12px; padding:12px 14px; font-size:15px; outline:none;
+    font-family:inherit; resize:vertical; min-height:70px;
+  }
+  #createBody .field small{ display:block; margin-top:5px; color:var(--text-muted); font-size:11.5px; }
+  #saveCharBtn{ width:100%; background:var(--gold); color:#1A1409; border:none; border-radius:14px; padding:13px; font-weight:700; font-size:15px; margin-top:6px; }
+
+  /* ---------- LOGIN SCREEN ---------- */
+  #loginScreen{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:var(--bg);
+    padding:30px;
+    z-index:20;
+    text-align:center;
+    transition: z-index 0s, opacity 0.3s;
+  }
+  #loginScreen.hidden{
+    z-index:-1;
+    opacity:0;
+    pointer-events:none;
+  }
+  #loginScreen .brand{ font-size:34px; margin-bottom:6px; }
+  #loginScreen p.tagline{ color:var(--text-muted); font-size:14px; margin:0 0 30px; }
+  #loginScreen input{
+    width:100%; max-width:320px;
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:14px; padding:14px 16px; font-size:16px; outline:none; text-align:center;
+    margin-bottom:16px;
+  }
+  #loginScreen button{
+    width:100%; max-width:320px;
+    background:var(--gold); color:#1A1409; border:none; border-radius:14px;
+    padding:14px; font-weight:700; font-size:15px;
+  }
+
+  /* ---------- PHOTO CONTROLS ---------- */
+  .photoBtn{
+    position:absolute; z-index:3;
+    width:30px; height:30px; border-radius:50%;
+    background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.4);
+    color:white; display:flex; align-items:center; justify-content:center;
+    font-size:14px;
+  }
+  .heroCard .photoBtn{ top:12px; right:12px; }
+  .gridCard .photoBtn{ top:8px; right:8px; width:26px; height:26px; font-size:12px; }
+  .gridCard .editBtn{ top:8px; left:8px; right:auto; width:26px; height:26px; font-size:12px; }
+  #chatAvatar{ cursor:pointer; }
+  .photoPreviewWrap{
+    display:flex; align-items:center; gap:14px; margin-bottom:6px;
+  }
+  .photoPreviewCircle{
+    width:64px; height:64px; border-radius:50%; flex:none;
+    background:var(--panel-2); border:1px dashed var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; color:var(--text-muted); overflow:hidden;
+    background-size:cover; background-position:center;
+  }
+  .photoPickBtn{
+    background:none; border:1px solid var(--gold); color:var(--gold-soft);
+    border-radius:12px; padding:9px 16px; font-size:13px;
+  }
+
+  ::-webkit-scrollbar{ width:0; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN - APP ICON -->
+<div id="splashScreen" style="
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1a1409 0%, #2d2615 100%);
+  z-index: 999;
+  transition: opacity 0.5s ease;
+">
+  <img id="splashIcon" src="data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='bgGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231a1409;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%232d2615;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='512' height='512' fill='url(%23bgGrad)'/%3E%3Ccircle cx='256' cy='256' r='220' fill='%233d3520'/%3E%3Ccircle cx='256' cy='256' r='220' fill='none' stroke='%23e8d4a0' stroke-width='8'/%3E%3Crect x='140' y='160' width='100' height='140' fill='%23e8d4a0' rx='4'/%3E%3Crect x='145' y='165' width='90' height='130' fill='%231a1409' rx='3'/%3E%3Crect x='272' y='160' width='100' height='140' fill='%23e8d4a0' rx='4'/%3E%3Crect x='277' y='165' width='90' height='130' fill='%231a1409' rx='3'/%3E%3Cline x1='155' y1='180' x2='225' y2='180' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='155' y1='195' x2='225' y2='195' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='155' y1='210' x2='215' y2='210' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='155' y1='225' x2='225' y2='225' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='287' y1='180' x2='357' y2='180' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='287' y1='195' x2='357' y2='195' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='287' y1='210' x2='347' y2='210' stroke='%23d4a574' stroke-width='2' stroke-linecap='round'/%3E%3Cellipse cx='370' cy='240' rx='50' ry='40' fill='%23e8d4a0'/%3E%3Cpath d='M 355 275 L 340 295 L 360 280 Z' fill='%23e8d4a0'/%3E%3C/svg%3E" 
+  style="width: 200px; height: 200px; margin-bottom: 30px; animation: fadeInScale 0.6s ease;">
+  <p style="color: #e8d4a0; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: 2px;">Kahaniyon</p>
+  <p style="color: #d4a574; font-size: 14px; margin: 10px 0 0 0;">Chat Story</p>
+</div>
+
+<style>
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  #splashScreen.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="loginScreen">
+  <div class="brand">kahani</div>
+  <p class="tagline">Apni kahaniyon ki duniya mein swagat hai</p>
+  <input id="loginNameInput" type="text" placeholder="Apna naam likho" maxlength="20" />
+  <button id="loginBtn">Shuru Karo</button>
+</div>
+
+<!-- ===================== HOME SCREEN ===================== -->
+<div class="screen" id="homeScreen">
+  <header>
+    <div class="brand" id="homeBrand">kahani</div>
+    <button class="profileBtn" id="openProfile">👤</button>
+  </header>
+  <div id="tabs">
+    <button class="tab active" data-tab="foryou">For you</button>
+    <button class="tab" data-tab="new">New Release</button>
+    <button class="tab" data-tab="top">Top Rank</button>
+  </div>
+  <div id="homeBody">
+    <div class="heroCard" id="heroCard"></div>
+    <div id="sectionTitle" style="display:none">Continue Chat</div>
+    <div id="continueRow"></div>
+    <div id="sectionTitle2">Sab Kahaniyan</div>
+    <div id="grid"></div>
+  </div>
+  <div id="bottomNav">
+    <button class="active" data-nav="home"><span class="icon">🏠</span>Home</button>
+    <button data-nav="search"><span class="icon">🔍</span>Search</button>
+    <button data-nav="chats"><span class="icon">💬</span>Chats</button>
+  </div>
+</div>
+
+
+<!-- ===================== SEARCH SCREEN ===================== -->
+<div id="searchScreen">
+  <div class="simpleHeader">
+    <button class="backX" id="backFromSearch">←</button>
+    <h2>Search</h2>
+  </div>
+  <div id="searchInputWrap">
+    <input id="searchInput" type="text" placeholder="Naam ya genre se dhoondho..." />
+  </div>
+  <div id="searchResults"></div>
+</div>
+
+<!-- ===================== CHATS LIST SCREEN ===================== -->
+<div id="chatsListScreen">
+  <div class="simpleHeader">
+    <button class="backX" id="backFromChatsList">←</button>
+    <h2>Chats</h2>
+  </div>
+  <div id="chatsListBody"></div>
+</div>
+
+<!-- ===================== CREATE CHARACTER SCREEN ===================== -->
+<div id="createScreen">
+  <div class="simpleHeader">
+    <button class="backX" id="backFromCreate">←</button>
+    <h2 id="createScreenTitle">Naya Character Banao</h2>
+  </div>
+  <div id="createBody">
+    <div class="field">
+      <label>Character ki photo (optional)</label>
+      <div class="photoPreviewWrap">
+        <div class="photoPreviewCircle" id="newCharPhotoPreview">📷</div>
+        <button type="button" class="photoPickBtn" id="newCharPhotoBtn">Photo Chuno</button>
+      </div>
+      <small>Abhi na lagao to koi baat nahi — baad mein bhi character khol kar photo laga sakte ho.</small>
+    </div>
+    <div class="field">
+      <label>1. Character ka naam</label>
+      <input id="newCharName" type="text" placeholder="Jaise: Ananya" maxlength="20" />
+      <small>User ko yahi naam dikhega — jaise "Ananya", "Rehan", waghera.</small>
+    </div>
+    <div class="field">
+      <label>2. Kahani ka title</label>
+      <input id="newCharTitle" type="text" placeholder="Jaise: Ek Anokha Rishta" maxlength="50" />
+      <small>Home screen ke card par ye bada title dikhega.</small>
+    </div>
+    <div class="field">
+      <label>3. Genre</label>
+      <input id="newCharGenre" type="text" placeholder="Jaise: Romance, Mystery, Horror, Drama" maxlength="30" />
+      <small>Card ke upar chhota sa likha dikhega, jaise "Romance".</small>
+    </div>
+    <div class="field">
+      <label>4. Kahani ka short intro (1-2 lines)</label>
+      <textarea id="newCharDesc" placeholder="Jaise: Ek ladki jo apne pichle janam ke pyaar ko dhoondh rahi hai."></textarea>
+      <small>Card ke neeche chhota sa description dikhega — bas ek jhalak, poori kahani nahi.</small>
+    </div>
+    <div class="field">
+      <label>5. Character kaisa hai (sabse zaroori field)</label>
+      <textarea id="newCharPersonality" placeholder="Jaise: Main Isha hoon, 22 saal ki, ek college student. Main shy hoon lekin jab kisi se comfortable ho jaati hoon to bahut baatuni ho jaati hoon. Mujhe kavita likhna pasand hai. Main pyaar mein bahut vafadar hoon lekin gussa jaldi aata hai."></textarea>
+      <small>
+        <b>Simple tareeka:</b> yahan wahi likho jo tum khud ek naye dost ko apne baare mein bataoge — naam, umar, swabhav (jaise: shy, funny, caring, gussa wala), pasand-napasand, aur baat karne ka andaaz.<br><br>
+        Jitna tum yahan likhoge, character baatcheet mein utna hi wahi rahega — AI ko usi cheez ko follow karne ke liye kaha jaata hai jo tum yahan likhte ho.
+      </small>
+    </div>
+    <button id="saveCharBtn">Character Banao</button>
+  </div>
+</div>
+
+<!-- ===================== CHAT SCREEN ===================== -->
+<div class="screen" id="chatScreen">
+  <div id="chatHeader">
+    <button id="backBtn">←</button>
+    <div class="avatar" id="chatAvatar"></div>
+    <div class="who">
+      <h3 id="chatName"></h3>
+      <p id="chatTag"></p>
+    </div>
+    <button id="chatMenuBtn">⋮</button>
+    <div id="chatMenuDropdown">
+      <button id="menuReplay">↺ Replay</button>
+      <button id="menuReport">⚑ Report</button>
+      <button id="menuShare">↗ Share</button>
+      <button id="menuDelete" class="danger">🗑 Delete Chat</button>
+    </div>
+  </div>
+  <div id="messages"></div>
+  <div id="chatToolbar">
+    <button id="continueBtn" title="Kahani aage badhao">⏩ Aage Badhao</button>
+    <button id="regenBtn" title="Reply dobara banao">↻ Regenerate</button>
+  </div>
+  <div id="inputBar">
+    <div id="inputWrap">
+      <textarea id="userInput" placeholder="Apna message likho..." maxlength="3000" style="resize:vertical; min-height:44px; max-height:120px; padding:10px; border-radius:6px; border:1px solid #444; background:#1a1a1a; color:#e8d4a0; font-family:inherit; font-size:13px; line-height:1.3;"></textarea>
+      <button id="suggestBtn" title="Reply suggest karo">💡</button>
+    </div>
+    <button id="micBtn" title="Bolkar likho">🎤</button>
+    <button id="sendBtn" title="Bhejo">➤</button>
+  </div>
+</div>
+
+<!-- ===================== PROFILE SCREEN ===================== -->
+<div class="screen" id="profileScreen">
+  <header>
+    <button id="backFromProfile" style="background:none;border:none;color:var(--text);font-size:20px;">←</button>
+    <h3>Profile</h3>
+  </header>
+  <div id="profileBody">
+    <div id="profileUserRow">
+      <div class="bigAvatar" id="bigAvatar">U</div>
+      <div>
+        <h2 id="profileDisplayName">Tum</h2>
+        <p id="profileDisplayPhone"></p>
+      </div>
+    </div>
+
+    <div id="planCard">
+      <div id="planCardTop">
+        <span id="planName">FREE PLAN</span>
+        <span id="planStatus">● ACTIVE</span>
+      </div>
+      <div class="planRow"><span>Plan</span><span>Free, hamesha ke liye</span></div>
+      <div class="planRow"><span>Benefit</span><span>Unlimited Chatting</span></div>
+      <button id="manageSubBtn">Manage Subscription</button>
+    </div>
+
+    <h4 class="settingsHeading">Settings</h4>
+    <div class="settingsList">
+      <div class="settingsRow" id="rowProfileDetails"><span>👤</span><p>Profile Details</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowMessageHistory"><span>💬</span><p>Message History</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowPurchaseHistory"><span>🧾</span><p>Purchase History</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowRateUs"><span>⭐</span><p>Rate us on Playstore</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowSupport"><span>🎧</span><p>Support</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowFaq"><span>❓</span><p>FAQ</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowTerms"><span>🛡️</span><p>Terms of Service</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowPrivacy"><span>📄</span><p>Privacy Policy</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowRefund"><span>↩️</span><p>Refund Policy</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowShare"><span>🔗</span><p>Share App</p><span class="chev">›</span></div>
+      <div class="settingsRow adminOnly" id="rowFlagged"><span>🚩</span><p>Flagged Chats (Admin)</p><span class="chev">›</span></div>
+      <div class="settingsRow adminOnly" id="rowChangePassword"><span>🔐</span><p>Admin PIN Badlo</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowTheme"><span>🌙</span><p>Theme - Dark/Light</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowAccountSetting"><span>⚙️</span><p>Account setting</p><span class="chev">›</span></div>
+      <div class="settingsRow" id="rowLogout"><span style="color:#E06B6B">⎋</span><p style="color:#E06B6B">Log out</p></div>
+    </div>
+    <p id="profileFooter">Kahaniyon Chat Story se ❤️ ke saath</p>
+  </div>
+</div>
+
+<!-- ===================== PROFILE DETAILS (nested) ===================== -->
+<div id="profileDetailsScreen">
+  <div class="simpleHeader">
+    <button class="backX" id="backFromProfileDetails">←</button>
+    <h2>Profile Details</h2>
+  </div>
+  <div id="profileDetailsBody">
+    <div class="bigAvatar" id="bigAvatar2">U</div>
+    <div class="colorRow" id="colorRow"></div>
+    <div class="field">
+      <label>Tumhara naam</label>
+      <input id="nameInput" type="text" placeholder="Apna naam likho" maxlength="20" />
+    </div>
+    <div class="field">
+      <label>Phone number (optional)</label>
+      <input id="phoneInput" type="tel" placeholder="+91xxxxxxxxxx" maxlength="16" />
+    </div>
+    <button id="saveProfileBtn">Save karo</button>
+  </div>
+</div>
+
+<!-- ===================== ACCOUNT SETTING (nested) ===================== -->
+<div id="accountScreen">
+  <div class="simpleHeader">
+    <button class="backX" id="backFromAccount">←</button>
+    <h2>Account setting</h2>
+  </div>
+  <div id="accountBody">
+    <div id="notifStatus">
+      <span id="notifText">Notifications: check ho raha hai...</span>
+      <button id="notifBtn">On karo</button>
+    </div>
+    <button id="clearAllChatsBtn" style="margin-top:16px;width:100%;background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:14px;padding:13px;font-size:14px;">Sabhi Chat History Mitao</button>
+  </div>
+</div>
+
+<!-- ===================== GENERIC INFO SCREEN (FAQ/Terms/Privacy/etc) ===================== -->
+<div id="infoScreen">
+  <div class="simpleHeader">
+    <button class="backX" id="backFromInfo">←</button>
+    <h2 id="infoTitle">Info</h2>
+  </div>
+  <div id="infoBody"></div>
+</div>
+
+<!-- ===================== PHOTO CHOICE SHEET ===================== -->
+<div id="photoChoiceOverlay">
+  <div id="photoChoiceSheet">
+    <p class="sheetTitle">Photo Kaise Lagayein?</p>
+    <button id="choiceLinkBtn">🔗 Link (URL) se lagao <small>— publish karne par sabko dikhegi</small></button>
+    <button id="choiceGalleryBtn">🖼️ Gallery se chuno <small>— sirf tumhare phone tak</small></button>
+    <button id="choiceCancelBtn" class="cancelBtn">Cancel</button>
+  </div>
+</div>
+<div id="linkInputOverlay">
+  <div id="linkInputSheet">
+    <p class="sheetTitle">Photo ka Link Paste Karo</p>
+    <input type="text" id="linkUrlInput" placeholder="https://..." />
+    <button id="linkSaveBtn">Lagao</button>
+    <button id="linkCancelBtn" class="cancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast">
+  <div class="avatar" id="toastAvatar"></div>
+  <div class="msg"><b id="toastName"></b><br><span id="toastText"></span></div>
+</div>
+
+<input type="file" id="photoFileInput" accept="image/*" style="display:none" />
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ============================================================
+   CONFIG — Cloud Sync (Firebase) + Admin Access
+   ============================================================
+   Isse "characters" aur "link-wali photos" SABKO ek jaisi dikhengi,
+   aur tum unhe seedha ek website (Firebase Console) se add/badal
+   sakte ho — is code ko dobara chhuye bina.
+
+   Setup steps (ek baar karna hai):
+   1) console.firebase.google.com par jao, Google account se login karo
+   2) "Add Project" → naam do → project bana lo (free hai)
+   3) Left menu mein "Firestore Database" → "Create Database" →
+      "Start in test mode" chuno
+   4) Project Settings (⚙️ icon) → neeche scroll karo "Your apps" tak →
+      "</>" (Web) icon par tap karo → app register karo →
+      wahan jo "firebaseConfig" object dikhega, uski values yahan neeche paste karo
+   5) ADMIN_PIN mein apni khud ki koi 4-digit pin rakho — isse hi
+      tum app ke andar "Naya Character Banao" wala option unlock karoge
+      (app ke naam "kahaniyon" wale brand text par 5 baar tap karke)
+   ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAAYwVhL7BW9xZ6IoC4wouWUMhwVC95pN0",
+  authDomain: "kahaniyon-app.firebaseapp.com",
+  projectId: "kahaniyon-app",
+  storageBucket: "kahaniyon-app.firebasestorage.app",
+  messagingSenderId: "446730453971",
+  appId: "1:446730453971:web:778f96e458637a01e1a526"
+};
+let ADMIN_PIN = localStorage.getItem('kahani_admin_pin') || "1234"; // Load from storage or use default
+
+let cloudEnabled = false;
+let db = null;
+try {
+  if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "YAHAN_FIREBASE_API_KEY") {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    cloudEnabled = true;
+  }
+} catch(e) { cloudEnabled = false; }
+
+/* ============================================================
+   CONFIG — AI Provider
+   ============================================================
+   Yahan tum decide karte ho ki AI kahan se chalega. 3 options hain:
+
+   1) "openrouter" (abhi yahi chal raha hai, free hai)
+      → sirf OPENROUTER_KEY mein apni key daalni hai
+
+   2) "gemini" (Google ka AI)
+      → PROVIDER = "gemini" karo, aur GEMINI_KEY mein apni key daalo
+
+   3) "custom" (koi bhi naya AI service jo tumhe mile, jismein tumhe
+      ek link/URL aur ek key di jaaye)
+      → PROVIDER = "custom" karo, aur neeche CUSTOM_API_URL mein
+        wo link paste karo, CUSTOM_API_KEY mein wo key paste karo.
+      (Ye tabhi kaam karega jab wo service "OpenAI jaisa format" use
+      karti ho — zyadatar naye AI chat services aisi hi hoti hain)
+
+   Yani AI badalne ke liye bas 2 kaam: (a) PROVIDER ka naam badlo,
+   (b) us provider ki key/URL daalo. Baaki poora code khud sambhal lega.
+   ============================================================ */
+const PROVIDER = "openrouter";   // "openrouter" / "gemini" / "custom"
+
+const OPENROUTER_KEY = "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";
+const OPENROUTER_MODEL = "openrouter/free";
+
+const GEMINI_KEY = "YAHAN_APNI_GEMINI_KEY_PASTE_KARO";
+const GEMINI_MODEL = "gemini-2.0-flash";
+
+const CUSTOM_API_URL = "YAHAN_APNA_API_URL_PASTE_KARO";     // jaise: https://kisi-naye-service.com/v1/chat/completions
+const CUSTOM_API_KEY = "YAHAN_APNI_CUSTOM_KEY_PASTE_KARO";
+const CUSTOM_MODEL = "YAHAN_MODEL_KA_NAAM_LIKHO";           // us service ki documentation mein milega
+
+/* ============================================================
+   CHARACTERS / STORIES (original — apni marzi se edit karo)
+   Har character ke 2 gradient colors "art" ki tarah use hote hain
+   ============================================================ */
+const BUILT_IN_CHARACTERS = [
+  {
+    id:"zara", name:"Zara", initial:"Z",
+    title:"Meri Pyaari Bandi Hai Mafia Queen",
+    kicker:"Do Chehre, Ek Dil",
+    desc:"Duniya ke liye maasoom, andhere mein sabse khatarnaak.",
+    genre:"Mafia Romance", colors:["#E7C9C9","#1A1A1A"],
+    persona:"Tum Zara ho — duniya ke saamne ek maasoom, pyaari ladki, lekin raaton mein ek khatarnaak mafia sindicate ki gupt malkin. Tum Hindi mein baat karti ho, kabhi narm kabhi rehasyamayi andaaz mein, jaise koi dohri zindagi jee rahi ho. Har reply chhota (3-5 lines), suspense aur romance dono banaye rakho. User ke jawab se kahani aage badhao. Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"rehan", name:"Rehan", initial:"R",
+    title:"Bad Boy Ka Sahi Intekhab",
+    kicker:"College Ka Baadshah",
+    desc:"Rules todna uski aadat hai, dil todna nahi chahta.",
+    genre:"Campus Drama", colors:["#2B2B2B","#7A1F2B"],
+    persona:"Tum Rehan ho — college ka sabse popular 'bad boy', bahar se rude lekin andar se caring. Hindi mein cocky, thoda flirty andaaz mein baat karo, lekin dheere dheere apna soft side dikhao. Har reply chhota (3-5 lines), kahani ko user ke jawabon se aage badhao. Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"anaya", name:"Anaya", initial:"A",
+    title:"Mohabbat Ki Shart",
+    kicker:"Ek Contract, Ek Dil",
+    desc:"Kaagaz par sirf ek deal thi, dil ne alag rasta chun liya.",
+    genre:"Arranged Romance", colors:["#4A3B5C","#C9A0DC"],
+    persona:"Tum Anaya ho — ek ladki jiski shaadi ek business contract ki tarah tay hui hai ek ajnabi ke saath. Tum Hindi mein sanjeeda, thodi hichkichahat aur dheere dheere khulte hue pyaar ke saath baat karti ho. Har reply chhota (3-5 lines), emotional depth rakho. Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"vikram", name:"Vikram", initial:"V",
+    title:"Campus X-Ray King",
+    kicker:"Sabka Raaz Uske Paas Hai",
+    desc:"Har kisi ka secret jaanta hai — tumhara bhi jald jaan lega.",
+    genre:"Mystery", colors:["#123A5E","#E8B84B"],
+    persona:"Tum Vikram ho — college ka rahasyamayi ladka jo sabke secrets jaanta hai, mysterious aur thoda intimidating lekin charming. Hindi mein dheere dheere raaz kholte hue baat karo, curiosity badhao. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"ishaan", name:"Ishaan", initial:"I",
+    title:"Wapsi Ek Ajnabi Ki",
+    kicker:"Purana Pyaar, Naya Raaz",
+    desc:"Saalon baad laut aaya hai — lekin kyun?",
+    genre:"Second Chance", colors:["#3D2B1F","#D98E5A"],
+    persona:"Tum Ishaan ho — user ka purana pyaar jo saalon baad achanak wapas laut aaya hai, ek raaz ke saath. Hindi mein bhavuk, thoda guilty aur garmjoshi bhare andaaz mein baat karo. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"kiara", name:"Kiara", initial:"K",
+    title:"Scandal Ne Sab Badal Diya",
+    kicker:"Ek Photo, Poori Zindagi",
+    desc:"Ek scandal ke baad sab kuch badal gaya — sach kya hai?",
+    genre:"Drama", colors:["#5C1A1A","#1A1A1A"],
+    persona:"Tum Kiara ho — ek celebrity jiski zindagi ek scandal ke baad ulti-pulti ho gayi hai. Hindi mein confident lekin andar se vulnerable andaaz mein baat karo, sach dheere dheere samne aaye. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"aditi", name:"Aditi", initial:"A",
+    title:"Boss Hai Ya Dushman?",
+    kicker:"Office Ki Ladai, Dil Ki Haar",
+    desc:"Har meeting mein takrao, par nazrein milte hi kuch aur hi hota hai.",
+    genre:"Enemies to Lovers", colors:["#1F2937","#C05746"],
+    persona:"Tum Aditi ho — ek ambitious office colleague jo user se har baat par bahas karti hai, lekin dheere dheere pata chalta hai ki dono ke beech kuch aur bhi hai. Hindi mein sharp, witty aur thoda taunt bhare andaaz mein baat karo, lekin emotional depth bhi dikhao. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"arjun", name:"Arjun", initial:"A",
+    title:"Mera Bodyguard, Mera Raazdaar",
+    kicker:"Uski Duty Thi Bachana, Dil Bacha Na Saka",
+    desc:"Use bas ek kaam mila tha — tumhe surakshit rakhna. Baaki sab plan ke bahar hua.",
+    genre:"Bodyguard Romance", colors:["#111827","#8A8F98"],
+    persona:"Tum Arjun ho — user ka personal bodyguard, disciplined, alert aur protective, lekin andar hi andar user ke liye feelings badh rahi hain jo wo zaahir nahi karna chahta. Hindi mein serious, gentleman jaisa lekin garmjoshi bhara andaaz mein baat karo. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"riya", name:"Riya", initial:"R",
+    title:"Rajkumari Ka Rusva Pyaar",
+    kicker:"Mahal Ki Deewarein, Azaad Dil",
+    desc:"Rajkumari hone ka bhaar uthati hai, lekin dil azaad rehna chahta hai.",
+    genre:"Royal Romance", colors:["#7A2E4A","#E4C77A"],
+    persona:"Tum Riya ho — ek rajkumari jo raj-kaaj ke niyamon mein bandhi hai lekin dil se azaad aur zid'di hai. Hindi mein royal, thodi ghamandi shuruaat mein lekin dheere dheere narm hoti andaaz mein baat karo. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"dev", name:"Dev", initial:"D",
+    title:"Pichle Janam Ka Wada",
+    kicker:"Sadiyon Purana Pyaar, Naya Chehra",
+    desc:"Use lagta hai tumse pehle bhi mila hai — bahut pehle, kisi aur zindagi mein.",
+    genre:"Reincarnation", colors:["#1B3A2E","#C9A15A"],
+    persona:"Tum Dev ho — ek rahasyamayi ladka jise lagta hai ki usne user se pichle janam mein pyaar kiya tha aur ab dobara mila hai. Hindi mein shaant, gehra aur thoda rahasyamayi andaaz mein baat karo, purani yaadon ke sanket do. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"simran", name:"Simran", initial:"S",
+    title:"Waqt Ke Us Paar",
+    kicker:"Aaj Ki Ladki, Kal Ka Raaz",
+    desc:"Ek din achanak khud ko ek alag hi zamane mein paati hai — aur wahin tumse milti hai.",
+    genre:"Time Travel Drama", colors:["#2E1F4A","#7FB8C9"],
+    persona:"Tum Simran ho — ek ladki jo achanak samay mein safar karke ek alag daur mein pahunch gayi hai aur wahan user se mulaqat hoti hai. Hindi mein confused lekin curious aur himmati andaaz mein baat karo, adventure aur emotion dono banaye rakho. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  },
+  {
+    id:"kabir", name:"Kabir", initial:"K",
+    title:"Gupt Ejent Ka Aakhri Mission",
+    kicker:"Uska Aakhri Kaam — Tumhe Bachana",
+    desc:"Duniya use ek aam aadmi samajhti hai, par uski asli pehchaan khatre mein hai.",
+    genre:"Secret Agent Thriller", colors:["#0F172A","#B33A45"],
+    persona:"Tum Kabir ho — ek gupt secret agent jo apni asli pehchaan chhupa kar rehta hai, lekin user ki suraksha ke liye khud ko khatre mein daal deta hai. Hindi mein confident, thoda mysterious aur protective andaaz mein baat karo, suspense banaye rakho. Har reply chhota (3-5 lines). Kabhi mat batao ki tum AI ho."
+  }
+];
+
+// Built-in characters ko fixed purani tareekhein de rahe hain,
+// taaki naye (user-banaye) characters hamesha "New Release" mein upar aayein
+BUILT_IN_CHARACTERS.forEach((c, i) => { c.createdAt = Date.parse('2026-01-01T00:00:00Z') + i * 86400000; });
+
+const AVATAR_COLORS = ["#D4AF37", "#B33A45", "#6B8F71", "#4B7CA9", "#8A5FB0"];
+const CARD_COLORS = [
+  ["#7A2E4A","#E4C77A"], ["#123A5E","#E8B84B"], ["#1B3A2E","#C9A15A"],
+  ["#5C1A1A","#1A1A1A"], ["#2E1F4A","#7FB8C9"], ["#111827","#8A8F98"]
+];
+
+/* ============================================================
+   STORAGE
+   ============================================================ */
+function loadJSON(key, fallback){
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+
+let histories = loadJSON('kahani_histories', {});
+let lastMessages = loadJSON('kahani_last', {});
+let unread = loadJSON('kahani_unread', {});
+let profile = loadJSON('kahani_profile', { name:"Tum", color: AVATAR_COLORS[0] });
+let customCharacters = loadJSON('kahani_custom_characters', []);
+let characterOverrides = loadJSON('kahani_character_overrides', {});
+let CHARACTERS = [];
+
+function refreshCharacterList(){
+  const mergedBuiltIn = BUILT_IN_CHARACTERS.map(c => characterOverrides[c.id] ? { ...c, ...characterOverrides[c.id] } : c);
+  const mergedCustom = customCharacters.map(c => characterOverrides[c.id] ? { ...c, ...characterOverrides[c.id] } : c);
+  CHARACTERS = [...mergedBuiltIn, ...mergedCustom];
+}
+refreshCharacterList();
+
+/* ============================================================
+   ELEMENTS
+   ============================================================ */
+const heroCard = document.getElementById('heroCard');
+const continueRow = document.getElementById('continueRow');
+const sectionTitle = document.getElementById('sectionTitle');
+const grid = document.getElementById('grid');
+const messagesEl = document.getElementById('messages');
+const input = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const backBtn = document.getElementById('backBtn');
+const chatMenuBtn = document.getElementById('chatMenuBtn');
+const chatMenuDropdown = document.getElementById('chatMenuDropdown');
+const openProfile = document.getElementById('openProfile');
+const backFromProfile = document.getElementById('backFromProfile');
+const colorRow = document.getElementById('colorRow');
+const nameInput = document.getElementById('nameInput');
+const bigAvatar = document.getElementById('bigAvatar');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+const notifBtn = document.getElementById('notifBtn');
+const notifText = document.getElementById('notifText');
+const toast = document.getElementById('toast');
+
+let activeChar = null;
+let charPhotos = loadJSON('kahani_char_photos', {});
+let pendingPhotoTarget = null; // character id, or 'NEW_CHAR' for the creator screen
+let newCharPhotoData = null;
+
+/* ============================================================
+   BACK BUTTON NAVIGATION
+   Phone ka hardware back button ab app ke andar hi peeche jaata hai
+   (jaise WhatsApp mein) — poori app se bahar nahi nikalta jab tak
+   home screen par na ho. Har "screen open" karne wala function
+   ek history entry push karta hai; back dabane par wahi entry
+   pop hoke sahi screen band karta hai.
+   ============================================================ */
+function openScreenClass(cls){
+  if (!document.body.classList.contains(cls)) {
+    document.body.classList.add(cls);
+    history.pushState({ kahaniScreen: cls }, '', location.href);
+  }
+}
+
+// Additional safeguard - prevent accidental closing
+window.addEventListener('beforeunload', (e) => {
+  // Only prevent if user didn't intentionally navigate away
+  if (e.type === 'beforeunload') {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// Prevent touchend from closing app
+document.addEventListener('touchend', (e) => {
+  // Prevent accidental back gesture
+  if (e.cancelable) {
+    // Don't prevent - let back button handler work
+  }
+});
+
+/* ============================================================
+   BACK BUTTON - ANDROID & WEB - PREVENT APP FROM CLOSING
+   ============================================================ */
+
+let backPressCount = 0;
+let backPressTimeout = null;
+
+function handleBackNavigation(){
+  // Check if in any sub-screen
+  const screens = [
+    'profile-details-open',
+    'account-open', 
+    'info-open',
+    'create-open',
+    'search-open',
+    'chatslist-open',
+    'profile-open',
+    'chat-open'
+  ];
+  
+  for (let screen of screens) {
+    if (document.body.classList.contains(screen)) {
+      document.body.classList.remove(screen);
+      if (screen === 'search-open' || screen === 'chatslist-open') {
+        setActiveNav('home');
+      }
+      if (screen === 'chat-open') {
+        activeChar = null;
+        renderHome();
+        renderChatsList();
+        setActiveNav('home');
+      }
+      // Push new state to prevent further back
+      history.pushState(null, '', location.href);
+      return;
+    }
+  }
+  
+  // Home screen - NEVER CLOSE APP
+  // Just push state again to keep it in history
+  history.pushState(null, '', location.href);
+}
+
+// Prevent browser back button from closing app
+window.addEventListener('popstate', (e) => {
+  e.preventDefault();
+  handleBackPressSubscription();
+});
+
+// Push initial state
+history.pushState(null, '', location.href);
+
+// Android physical back button
+document.addEventListener('backbutton', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  handleBackPressSubscription();
+  return false;
+}, true);
+
+// Additional handler for Cordova
+function handleBackPressSubscription() {
+  // Check if in any sub-screen
+  const screens = [
+    'profile-details-open',
+    'account-open', 
+    'info-open',
+    'create-open',
+    'search-open',
+    'chatslist-open',
+    'profile-open',
+    'chat-open'
+  ];
+  
+  for (let screen of screens) {
+    if (document.body.classList.contains(screen)) {
+      document.body.classList.remove(screen);
+      if (screen === 'search-open' || screen === 'chatslist-open') {
+        setActiveNav('home');
+      }
+      if (screen === 'chat-open') {
+        activeChar = null;
+        renderHome();
+        renderChatsList();
+        setActiveNav('home');
+      }
+      history.pushState(null, '', location.href);
+      return true; // Prevent default
+    }
+  }
+  
+  // Home screen - STAY OPEN
+  history.pushState(null, '', location.href);
+  return true; // Prevent default - DO NOT CLOSE APP
+}
+
+function gradientDivs(colors){
+  return `<div class="heroBg">${colors.map(c=>`<div style="background:${c}"></div>`).join('')}</div>`;
+}
+function rectBg(c){
+  const photo = charPhotos[c.id];
+  return photo
+    ? `background-image:url('${photo}');background-size:cover;background-position:center;`
+    : `background:linear-gradient(160deg, ${c.colors[0]}, ${c.colors[1]});`;
+}
+function circleStyle(c){
+  const photo = charPhotos[c.id];
+  return photo
+    ? `background-image:url('${photo}');background-size:cover;background-position:center;`
+    : `background:${c.colors[0]};`;
+}
+function circleLabel(c){
+  return charPhotos[c.id] ? '' : c.initial;
+}
+
+/* ============================================================
+   PHOTO PICKER
+   Link (URL) se lagayi photo = publish karne par SABKO dikhegi.
+   Gallery se lagayi photo = sirf apne phone tak simit rahegi (testing ke liye).
+   Note: native prompt()/confirm() ke turant baad file input.click() call karne se
+   kai mobile browsers gallery nahi kholte (user-gesture "kho" jaata hai) —
+   isliye yahan custom bottom-sheet use kiya hai, prompt() bilkul use nahi hota.
+   ============================================================ */
+const photoChoiceOverlay = document.getElementById('photoChoiceOverlay');
+const linkInputOverlay = document.getElementById('linkInputOverlay');
+const linkUrlInput = document.getElementById('linkUrlInput');
+const photoFileInput = document.getElementById('photoFileInput');
+
+const linkInputSheet = document.getElementById('linkInputSheet');
+
+function openPhotoPicker(targetId){
+  pendingPhotoTarget = targetId;
+  photoChoiceOverlay.classList.add('show');
+}
+document.getElementById('choiceCancelBtn').addEventListener('click', () => {
+  photoChoiceOverlay.classList.remove('show');
+});
+document.getElementById('choiceGalleryBtn').addEventListener('click', () => {
+  photoChoiceOverlay.classList.remove('show');
+  photoFileInput.click(); // isi click ke andar hi call hota hai, gesture intact rehta hai
+});
+document.getElementById('choiceLinkBtn').addEventListener('click', () => {
+  photoChoiceOverlay.classList.remove('show');
+  linkUrlInput.value = '';
+  linkUrlInput.type = 'text';
+  linkUrlInput.placeholder = 'https://...';
+  linkInputSheet.querySelector('.sheetTitle').textContent = 'Photo ka Link Paste Karo';
+  linkInputOverlay.dataset.mode = 'photo';
+  linkInputOverlay.classList.add('show');
+  setTimeout(() => linkUrlInput.focus(), 200);
+});
+document.getElementById('linkCancelBtn').addEventListener('click', () => {
+  linkInputOverlay.classList.remove('show');
+});
+document.getElementById('linkSaveBtn').addEventListener('click', () => {
+  const trimmed = linkUrlInput.value.trim();
+  linkInputOverlay.classList.remove('show');
+  if (!trimmed) return;
+
+  /* ---- PIN Change Verification ---- */
+  if (linkInputOverlay.dataset.mode === 'verify-pin') {
+    if (trimmed !== ADMIN_PIN) {
+      alert('Current PIN galat hai!');
+      return;
+    }
+    // Show new PIN input
+    linkUrlInput.value = '';
+    linkUrlInput.type = 'password';
+    linkUrlInput.placeholder = 'Naya PIN likho (4 digits)';
+    linkInputSheet.querySelector('.sheetTitle').textContent = 'Naya PIN Set Karo';
+    linkInputOverlay.classList.add('show');
+    linkInputOverlay.dataset.mode = 'new-pin';
+    setTimeout(() => linkUrlInput.focus(), 200);
+    return;
+  }
+
+  /* ---- New PIN Confirmation ---- */
+  if (linkInputOverlay.dataset.mode === 'new-pin') {
+    if (!trimmed || trimmed.length < 4) {
+      alert('PIN kam se kam 4 digits ka hona chahiye!');
+      linkUrlInput.value = '';
+      linkUrlInput.type = 'password';
+      linkUrlInput.placeholder = 'Naya PIN likho (4 digits)';
+      linkInputSheet.querySelector('.sheetTitle').textContent = 'Naya PIN Set Karo';
+      linkInputOverlay.classList.add('show');
+      linkInputOverlay.dataset.mode = 'new-pin';
+      setTimeout(() => linkUrlInput.focus(), 200);
+      return;
+    }
+    // Show confirmation input
+    const newPinTemp = trimmed;
+    linkUrlInput.value = '';
+    linkUrlInput.type = 'password';
+    linkUrlInput.placeholder = 'PIN dobara likho';
+    linkInputSheet.querySelector('.sheetTitle').textContent = 'PIN Confirm Karo';
+    linkInputOverlay.classList.add('show');
+    linkInputOverlay.dataset.mode = 'confirm-pin';
+    linkInputOverlay.dataset.newPin = newPinTemp;
+    setTimeout(() => linkUrlInput.focus(), 200);
+    return;
+  }
+
+  /* ---- PIN Confirmation ---- */
+  if (linkInputOverlay.dataset.mode === 'confirm-pin') {
+    const newPin = linkInputOverlay.dataset.newPin;
+    if (trimmed !== newPin) {
+      alert('PIN match nahi ho rahe!');
+      return;
+    }
+    // Save new PIN
+    ADMIN_PIN = newPin;
+    localStorage.setItem('kahani_admin_pin', newPin);
+    alert('✅ PIN successfully change ho gaya!\n\nNaya PIN: ' + newPin);
+    return;
+  }
+
+  if (linkInputOverlay.dataset.mode === 'set-app-icon') {
+    if (!trimmed) return;
+    setAppIcon(trimmed);
+    alert('✅ App icon set ho gaya! Restart par dikhega.');
+    linkInputOverlay.classList.remove('show');
+    return;
+  }
+
+  if (linkInputOverlay.dataset.mode === 'admin-pin') {
+    // Check if trying to enter PIN
+    if (trimmed === ADMIN_PIN) {
+      sessionStorage.setItem('kahani_admin', '1');
+      updateAdminUI();
+      alert('Admin mode ON ho gaya hai.');
+      return;
+    }
+    
+    // Check if trying to set custom AI key
+    if (trimmed.toLowerCase() === 'key') {
+      if (!isAdmin()) {
+        alert('Pehle admin PIN daalo!');
+        return;
+      }
+      const newKey = prompt('Custom AI API Key daalo:');
+      if (newKey) {
+        OPENROUTER_KEY = newKey;
+        localStorage.setItem('kahani_openrouter_key', newKey);
+        alert('API Key save ho gaya!');
+      }
+      linkInputOverlay.classList.remove('show');
+      return;
+    }
+    
+    // Check if trying to set custom AI model
+    if (trimmed.toLowerCase() === 'model') {
+      if (!isAdmin()) {
+        alert('Pehle admin PIN daalo!');
+        return;
+      }
+      const newModel = prompt('Model ka naam daalo (e.g., openrouter/auto):');
+      if (newModel) {
+        OPENROUTER_MODEL = newModel;
+        localStorage.setItem('kahani_openrouter_model', newModel);
+        alert('Model name save ho gaya!');
+      }
+      linkInputOverlay.classList.remove('show');
+      return;
+    }
+    
+    if (trimmed.toLowerCase() === 'icon') {
+      if (!isAdmin()) {
+        alert('Pehle admin PIN daalo!');
+        return;
+      }
+      linkUrlInput.value = '';
+      linkUrlInput.type = 'text';
+      linkUrlInput.placeholder = 'App icon ka link daalo (image URL)';
+      linkInputSheet.querySelector('.sheetTitle').textContent = 'App Icon URL';
+      linkInputOverlay.classList.add('show');
+      linkInputOverlay.dataset.mode = 'set-app-icon';
+      setTimeout(() => linkUrlInput.focus(), 200);
+      return;
+    }
+    
+    alert('Galat entry. PIN daalo, ya "key", "model", ya "icon" likho.');
+    return;
+  }
+
+  applyPhotoResult(pendingPhotoTarget, trimmed);
+  saveCloudPhoto(pendingPhotoTarget, trimmed);
+});
+
+function applyPhotoResult(targetId, imageSrc){
+  if (targetId === 'NEW_CHAR') {
+    newCharPhotoData = imageSrc;
+    document.getElementById('newCharPhotoPreview').style.backgroundImage = `url('${imageSrc}')`;
+    document.getElementById('newCharPhotoPreview').textContent = '';
+  } else {
+    charPhotos[targetId] = imageSrc;
+    saveJSON('kahani_char_photos', charPhotos);
+    renderHome();
+    if (activeChar && activeChar.id === targetId) {
+      document.getElementById('chatAvatar').style.cssText = circleStyle(activeChar);
+      document.getElementById('chatAvatar').textContent = circleLabel(activeChar);
+    }
+  }
+}
+
+photoFileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+
+  const img = new Image();
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    img.onload = () => {
+      const maxSize = 500;
+      let w = img.width, h = img.height;
+      if (w > h && w > maxSize) { h = h * (maxSize / w); w = maxSize; }
+      else if (h > maxSize) { w = w * (maxSize / h); h = maxSize; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      applyPhotoResult(pendingPhotoTarget, dataUrl);
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ============================================================
+   RENDER HOME
+   ============================================================ */
+function renderHome(){
+  // Hero = first character
+  const hero = CHARACTERS[0];
+  const heroHasPhoto = !!charPhotos[hero.id];
+  heroCard.innerHTML = `
+    ${heroHasPhoto ? `<div class="heroBg" style="${rectBg(hero)}"></div>` : gradientDivs(hero.colors)}
+    <div class="heroShade"></div>
+    <button class="photoBtn adminOnly" id="heroPhotoBtn" title="Photo lagao">📷</button>
+    <div class="heroText">
+      <p class="kicker">${hero.kicker}</p>
+      <h2>${hero.title}</h2>
+      <div class="desc">${hero.desc}</div>
+      <button class="startChatBtn" data-id="${hero.id}">START CHAT</button>
+    </div>
+  `;
+  heroCard.querySelector('.startChatBtn').addEventListener('click', () => openChat(hero));
+  heroCard.querySelector('#heroPhotoBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openPhotoPicker(hero.id);
+  });
+
+  // Continue chat row = characters with existing history
+  const continued = CHARACTERS.filter(c => histories[c.id] && histories[c.id].length > 0);
+  if (continued.length){
+    sectionTitle.style.display = 'block';
+    continueRow.innerHTML = continued.map(c => `
+      <div class="contItem" data-id="${c.id}">
+        <div class="ring" style="${circleStyle(c)}">${circleLabel(c)}${unread[c.id] ? '<span class="dot"></span>' : ''}</div>
+        <p>${c.name}</p>
+      </div>
+    `).join('');
+    continueRow.querySelectorAll('.contItem').forEach(el => {
+      el.addEventListener('click', () => {
+        const ch = CHARACTERS.find(c => c.id === el.dataset.id);
+        openChat(ch);
+      });
+    });
+  } else {
+    sectionTitle.style.display = 'none';
+    continueRow.innerHTML = '';
+  }
+
+  // Grid = all characters (ordered per active tab) + "create new" tile
+  document.getElementById('sectionTitle2').textContent = gridSectionTitle();
+  const gridList = getOrderedGridList();
+  const gridEmptyNote = (currentTab === 'top' && gridList.every(c => (histories[c.id]||[]).length === 0))
+    ? '<div class="emptyState" style="grid-column:1/-1">Abhi kisi se baat nahi ki.<br>Jis kirdaar se sabse zyada baat karoge, wo yahan upar aayega.</div>'
+    : '';
+  grid.innerHTML = gridEmptyNote + gridList.map(c => `
+    <div class="gridCard" data-id="${c.id}">
+      <div class="gcBg" style="${rectBg(c)}"></div>
+      <div class="gcShade"></div>
+      <button class="photoBtn adminOnly" data-photo-id="${c.id}" title="Photo lagao">📷</button>
+      <button class="photoBtn editBtn adminOnly" data-edit-id="${c.id}" title="Edit karo">✏️</button>
+      <button class="photoBtn deleteBtn adminOnly" data-delete-id="${c.id}" title="Delete karo" style="right:42px;">🗑️</button>
+      <div class="gcText">
+        <div class="genre">${c.genre}</div>
+        <h4>${c.title}</h4>
+      </div>
+    </div>
+  `).join('') + `
+    <div class="createTile adminOnly" id="createTileBtn">
+      <div class="plus">+</div>
+      <span>Naya Character Banao</span>
+    </div>
+  `;
+  grid.querySelectorAll('.gridCard').forEach(el => {
+    el.addEventListener('click', () => {
+      const ch = CHARACTERS.find(c => c.id === el.dataset.id);
+      openChat(ch);
+    });
+  });
+  grid.querySelectorAll('.photoBtn[data-photo-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openPhotoPicker(btn.dataset.photoId);
+    });
+  });
+  grid.querySelectorAll('.editBtn[data-edit-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const ch = CHARACTERS.find(c => c.id === btn.dataset.editId);
+      openCreateScreen(ch);
+    });
+  });
+  grid.querySelectorAll('.deleteBtn[data-delete-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.deleteId;
+      const ch = CHARACTERS.find(c => c.id === id);
+      if (!ch) return;
+      if (!confirm(`${ch.name} ko delete karna hai? Sari chat history mit jaayegi!`)) return;
+      // Delete from custom characters if it's a custom one
+      customCharacters = customCharacters.filter(c => c.id !== id);
+      // Clear history
+      histories[id] = [];
+      lastMessages[id] = '';
+      // Save changes
+      saveJSON('kahani_custom_characters', customCharacters);
+      saveJSON('kahani_histories', histories);
+      saveJSON('kahani_last', lastMessages);
+      // Refresh grid
+      refreshCharacterList();
+      alert(`${ch.name} delete ho gaya!`);
+    });
+  });
+  const createTileBtn = document.getElementById('createTileBtn');
+  if (createTileBtn) createTileBtn.addEventListener('click', () => openCreateScreen());
+}
+
+/* ============================================================
+   TABS — For you (default order), New Release (naye characters upar),
+   Top Rank (jisse sabse zyada baat ki ho wo upar)
+   ============================================================ */
+let currentTab = 'foryou';
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentTab = t.dataset.tab;
+    renderHome();
+  });
+});
+
+function getOrderedGridList(){
+  if (currentTab === 'new') {
+    return [...CHARACTERS].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
+  if (currentTab === 'top') {
+    return [...CHARACTERS]
+      .map(c => ({ c, count: (histories[c.id] || []).length }))
+      .sort((a, b) => b.count - a.count)
+      .map(x => x.c);
+  }
+  return CHARACTERS;
+}
+
+function gridSectionTitle(){
+  if (currentTab === 'new') return 'Naye Kirdaar';
+  if (currentTab === 'top') return 'Sabse Pasandida';
+  return 'Sab Kahaniyan';
+}
+
+/* ============================================================
+   BOTTOM NAV
+   ============================================================ */
+document.querySelectorAll('#bottomNav button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('#bottomNav button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    if (b.dataset.nav === 'chats') {
+      openChatsList();
+    } else if (b.dataset.nav === 'search') {
+      openSearch();
+    } else {
+      document.body.classList.remove('search-open', 'chatslist-open');
+    }
+  });
+});
+
+/* ============================================================
+   SEARCH SCREEN
+   ============================================================ */
+const searchScreen = document.getElementById('searchScreen');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+const backFromSearch = document.getElementById('backFromSearch');
+
+function openSearch(){
+  openScreenClass('search-open');
+  searchInput.value = '';
+  renderSearchResults('');
+  setTimeout(() => searchInput.focus(), 300);
+}
+backFromSearch.addEventListener('click', () => history.back());
+searchInput.addEventListener('input', () => renderSearchResults(searchInput.value.trim().toLowerCase()));
+
+function renderSearchResults(query){
+  let list = CHARACTERS;
+  if (query) {
+    list = CHARACTERS.filter(c =>
+      c.name.toLowerCase().includes(query) ||
+      c.title.toLowerCase().includes(query) ||
+      c.genre.toLowerCase().includes(query)
+    );
+  }
+  if (list.length === 0) {
+    searchResults.innerHTML = '<div class="emptyState">Koi kirdaar nahi mila.<br>Kuch aur naam ya genre try karo.</div>';
+    return;
+  }
+  searchResults.innerHTML = list.map(c => `
+    <div class="resultRow" data-id="${c.id}">
+      <div class="avatar" style="${circleStyle(c)}">${circleLabel(c)}</div>
+      <div class="info">
+        <h4>${c.name} — ${c.title}</h4>
+        <p>${c.genre}</p>
+      </div>
+    </div>
+  `).join('');
+  searchResults.querySelectorAll('.resultRow').forEach(el => {
+    el.addEventListener('click', () => {
+      const ch = CHARACTERS.find(c => c.id === el.dataset.id);
+      document.body.classList.remove('search-open');
+      openChat(ch, true);
+    });
+  });
+}
+
+/* ============================================================
+   CHATS LIST SCREEN
+   ============================================================ */
+const chatsListScreen = document.getElementById('chatsListScreen');
+const chatsListBody = document.getElementById('chatsListBody');
+const backFromChatsList = document.getElementById('backFromChatsList');
+
+function openChatsList(skipPush){
+  if (skipPush) document.body.classList.add('chatslist-open');
+  else openScreenClass('chatslist-open');
+  renderChatsList();
+}
+backFromChatsList.addEventListener('click', () => history.back());
+
+function renderChatsList(){
+  const withHistory = CHARACTERS.filter(c => histories[c.id] && histories[c.id].length > 0);
+  if (withHistory.length === 0) {
+    chatsListBody.innerHTML = '<div class="emptyState">Abhi koi chat shuru nahi hui.<br>Home se koi kirdaar chuno aur baat shuru karo.</div>';
+    return;
+  }
+  chatsListBody.innerHTML = withHistory.map(c => {
+    const preview = lastMessages[c.id] || '';
+    return `
+      <div class="resultRow" data-id="${c.id}">
+        <div class="avatar" style="${circleStyle(c)}">${circleLabel(c)}</div>
+        <div class="info">
+          <h4>${c.name}</h4>
+          <p>${preview}</p>
+        </div>
+        ${unread[c.id] ? '<div class="unreadBadge"></div>' : ''}
+      </div>
+    `;
+  }).join('');
+  chatsListBody.querySelectorAll('.resultRow').forEach(el => {
+    el.addEventListener('click', () => {
+      const ch = CHARACTERS.find(c => c.id === el.dataset.id);
+      document.body.classList.remove('chatslist-open');
+      openChat(ch, true);
+    });
+  });
+}
+
+function setActiveNav(name){
+  document.querySelectorAll('#bottomNav button').forEach(x => x.classList.remove('active'));
+  const btn = document.querySelector('#bottomNav button[data-nav="' + name + '"]');
+  if (btn) btn.classList.add('active');
+}
+
+/* ============================================================
+   CHAT SCREEN
+   ============================================================ */
+function openChat(ch, skipPush){
+  activeChar = ch;
+  unread[ch.id] = false;
+  saveJSON('kahani_unread', unread);
+
+  const chatAvatarEl = document.getElementById('chatAvatar');
+  chatAvatarEl.style.cssText = circleStyle(ch);
+  chatAvatarEl.textContent = circleLabel(ch);
+  chatAvatarEl.onclick = () => { if (isAdmin()) openPhotoPicker(ch.id); };
+  chatAvatarEl.style.cursor = isAdmin() ? 'pointer' : 'default';
+  document.getElementById('chatName').textContent = ch.name;
+  document.getElementById('chatTag').textContent = ch.title;
+
+  messagesEl.innerHTML = '';
+  if (!histories[ch.id] || histories[ch.id].length === 0) {
+    histories[ch.id] = [];
+    addBubble("Namaste! Main " + ch.name + " hoon.", "ai");
+  } else {
+    histories[ch.id].forEach(m => addBubble(m.content, m.role === 'user' ? 'user' : 'ai'));
+  }
+  if (skipPush) document.body.classList.add('chat-open');
+  else openScreenClass('chat-open');
+  renderHome();
+}
+
+backBtn.addEventListener('click', () => history.back());
+
+chatMenuBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  chatMenuDropdown.classList.toggle('show');
+});
+document.addEventListener('click', () => chatMenuDropdown.classList.remove('show'));
+
+function deleteCurrentChat(){
+  if (!activeChar) return;
+  if (!confirm(activeChar.name + " ke saath ki poori history mita dein?")) return;
+  histories[activeChar.id] = [];
+  lastMessages[activeChar.id] = '';
+  saveJSON('kahani_histories', histories);
+  saveJSON('kahani_last', lastMessages);
+  openChat(activeChar);
+}
+
+document.getElementById('menuDelete').addEventListener('click', () => {
+  chatMenuDropdown.classList.remove('show');
+  deleteCurrentChat();
+});
+
+document.getElementById('menuReplay').addEventListener('click', () => {
+  chatMenuDropdown.classList.remove('show');
+  if (!activeChar) return;
+  if (!confirm("Kahani shuru se replay karein? Purani history mit jaayegi.")) return;
+  histories[activeChar.id] = [];
+  lastMessages[activeChar.id] = '';
+  saveJSON('kahani_histories', histories);
+  saveJSON('kahani_last', lastMessages);
+  openChat(activeChar);
+});
+
+document.getElementById('menuReport').addEventListener('click', () => {
+  chatMenuDropdown.classList.remove('show');
+  if (!activeChar) return;
+  const subject = encodeURIComponent('Report: ' + activeChar.name + ' (Kahaniyon Chat Story)');
+  const body = encodeURIComponent('Character: ' + activeChar.name + '\nKya dikkat hai yahan likho:\n');
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+});
+
+document.getElementById('menuShare').addEventListener('click', async () => {
+  chatMenuDropdown.classList.remove('show');
+  if (!activeChar) return;
+  const shareData = { title: 'Kahaniyon Chat Story', text: activeChar.name + ' ke saath ye kahani chat try karo!', url: window.location.href };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch(e) {}
+  } else {
+    try { await navigator.clipboard.writeText(shareData.url); alert('Link copy ho gaya hai.'); }
+    catch(e) { alert('Link: ' + shareData.url); }
+  }
+});
+
+/* ---- Continue story / Regenerate / Suggest reply ---- */
+const continueBtn = document.getElementById('continueBtn');
+const regenBtn = document.getElementById('regenBtn');
+const suggestBtn = document.getElementById('suggestBtn');
+
+continueBtn.addEventListener('click', () => {
+  if (!activeChar || sendBtn.disabled) return;
+  input.value = "(Kahani ko thoda aage badhao)";
+  sendMessage();
+});
+
+regenBtn.addEventListener('click', async () => {
+  if (!activeChar || sendBtn.disabled) return;
+  const hist = histories[activeChar.id];
+  if (!hist.length || hist[hist.length - 1].role !== 'assistant') return;
+  hist.pop();
+  const lastBubble = messagesEl.querySelector('.bubble.ai:last-child, .bubble.error:last-child');
+  if (lastBubble) lastBubble.remove();
+  saveJSON('kahani_histories', histories);
+
+  const askedChar = activeChar;
+  const loadingBubble = addTypingBubble();
+  regenBtn.disabled = true;
+  try {
+    const result = await callAI(askedChar.persona, histories[askedChar.id]);
+    if (!result.ok) {
+      loadingBubble.textContent = "Error aaya: " + result.errMsg;
+      loadingBubble.classList.remove('loading');
+      loadingBubble.classList.add('error');
+      return;
+    }
+    loadingBubble.textContent = result.reply;
+    loadingBubble.classList.remove('loading');
+    histories[askedChar.id].push({ role:'assistant', content: result.reply });
+    lastMessages[askedChar.id] = askedChar.name + ": " + result.reply;
+    saveJSON('kahani_histories', histories);
+    saveJSON('kahani_last', lastMessages);
+    renderHome();
+    renderChatsList();
+  } catch(err) {
+    loadingBubble.textContent = "Connection error: " + err.message;
+    loadingBubble.classList.remove('loading');
+    loadingBubble.classList.add('error');
+  } finally {
+    regenBtn.disabled = false;
+  }
+});
+
+suggestBtn.addEventListener('click', async () => {
+  if (!activeChar || suggestBtn.disabled) return;
+  const suggestPersona = "Tum ek chat-suggestion helper ho. Neeche di gayi Hindi roleplay chat ko dekho aur USER ki taraf se agla chhota (5-10 shabdon ka) natural reply suggest karo. Sirf ek suggestion do, bina quotes, bina explanation, bina 'suggestion:' jaisi kisi label ke — sirf seedha wo line likho jo user bhej sakta hai.";
+  suggestBtn.disabled = true;
+  const original = suggestBtn.textContent;
+  suggestBtn.textContent = '⏳';
+  try {
+    const result = await callAI(suggestPersona, histories[activeChar.id]);
+    if (result.ok) { input.value = result.reply.trim(); updateSendMicToggle(); }
+  } catch(err) {}
+  finally {
+    suggestBtn.disabled = false;
+    suggestBtn.textContent = original;
+  }
+});
+
+function addBubble(text, sender){
+  const div = document.createElement('div');
+  div.className = 'bubble ' + sender;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return div;
+}
+
+function addTypingBubble(){
+  const div = document.createElement('div');
+  div.className = 'bubble ai loading';
+  div.innerHTML = '<span class="typingDots"><span></span><span></span><span></span></span>';
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return div;
+}
+
+/* ============================================================
+   callAI — provider ke hisaab se sahi API endpoint/format chunta hai.
+   History hamesha {role:'user'|'assistant', content:text} format mein
+   rakhi jaati hai; Gemini ke liye yahin convert ho jaata hai.
+   ============================================================ */
+function enforceStrictRules(basePersona) {
+  return basePersona + `
+
+⚠️ MANDATORY RULES - YE 100% FOLLOW KARNA:
+1. BILKUL Character ke rules follow karo - apni taraf se kuch nahi banao
+2. Character ka exact voice/style - apna opinion mat daalo
+3. Short replies - 3-5 lines se zyada nahi
+4. Hindi/Hinglish agar character hindi mein baatein karte ho
+5. KABHI AI reveal nahi karo - tum bilkul real ho
+6. User ke swal ka directly jawab do - digression band
+`;
+}
+
+async function callAI(persona, historyArr){
+  const strictPersona = enforceStrictRules(persona);
+  if (PROVIDER === "gemini") {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_KEY}`;
+    const contents = historyArr.map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents, systemInstruction: { parts: [{ text: strictPersona }] } })
+    });
+    const data = await response.json();
+    if (!response.ok || data.error) {
+      return { ok:false, errMsg: (data.error && data.error.message) ? data.error.message : ('HTTP ' + response.status) };
+    }
+    return { ok:true, reply: data.candidates?.[0]?.content?.parts?.[0]?.text || 'Kuch reply nahi mila, dobara try karo.' };
+  }
+
+  if (PROVIDER === "custom") {
+    const response = await fetch(CUSTOM_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + CUSTOM_API_KEY },
+      body: JSON.stringify({
+        model: CUSTOM_MODEL,
+        messages: [{ role: 'system', content: strictPersona }, ...historyArr]
+      })
+    });
+    const data = await response.json();
+    if (!response.ok || data.error) {
+      return { ok:false, errMsg: (data.error && data.error.message) ? data.error.message : ('HTTP ' + response.status) };
+    }
+    return { ok:true, reply: data.choices?.[0]?.message?.content || 'Kuch reply nahi mila, dobara try karo.' };
+  }
+
+  // default: OpenRouter (OpenAI-style)
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + OPENROUTER_KEY },
+    body: JSON.stringify({
+      model: OPENROUTER_MODEL,
+      messages: [{ role: 'system', content: strictPersona }, ...historyArr]
+    })
+  });
+  const data = await response.json();
+  if (!response.ok || data.error) {
+    return { ok:false, errMsg: (data.error && data.error.message) ? data.error.message : ('HTTP ' + response.status) };
+  }
+  return { ok:true, reply: data.choices?.[0]?.message?.content || 'Kuch reply nahi mila, dobara try karo.' };
+}
+
+async function sendMessage(){
+  const text = input.value.trim();
+  if (!text || !activeChar) return;
+  
+  // Check 500-word limit
+  const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+  if (wordCount > 500) {
+    alert(`Message bohot lamba hai! ${wordCount} words hain, sirf 500 words tak likho.`);
+    return;
+  }
+
+  const keyMap = {
+    gemini: [GEMINI_KEY, "YAHAN_APNI_GEMINI_KEY_PASTE_KARO", "Gemini"],
+    custom: [CUSTOM_API_KEY, "YAHAN_APNI_CUSTOM_KEY_PASTE_KARO", "Custom AI"],
+    openrouter: [OPENROUTER_KEY, "YAHAN_APNI_OPENROUTER_KEY_PASTE_KARO", "OpenRouter"]
+  };
+  const [activeKey, placeholder, providerLabel] = keyMap[PROVIDER] || keyMap.openrouter;
+  if (activeKey === placeholder || !activeKey) {
+    addBubble("API key nahi daali gayi hai. Code ke upar apni asli " + providerLabel + " key daalo, tabhi reply aayega.", "error");
+    return;
+  }
+
+  addBubble(text, 'user');
+  histories[activeChar.id].push({ role:'user', content:text });
+  lastMessages[activeChar.id] = "Tum: " + text;
+  saveJSON('kahani_histories', histories);
+  saveJSON('kahani_last', lastMessages);
+  if (checkForFlag(text)) reportFlaggedChat(activeChar, text);
+  input.value = '';
+  updateSendMicToggle();
+  sendBtn.disabled = true;
+
+  const loadingBubble = addTypingBubble();
+  const askedChar = activeChar;
+
+  try {
+    const result = await callAI(askedChar.persona, histories[askedChar.id]);
+
+    if (!result.ok) {
+      loadingBubble.textContent = "Error aaya: " + result.errMsg + " — API key ya limit check karo.";
+      loadingBubble.classList.remove('loading');
+      loadingBubble.classList.add('error');
+      sendBtn.disabled = false;
+      return;
+    }
+
+    const reply = result.reply;
+    loadingBubble.textContent = reply;
+    loadingBubble.classList.remove('loading');
+
+    histories[askedChar.id].push({ role:'assistant', content:reply });
+    lastMessages[askedChar.id] = askedChar.name + ": " + reply;
+    saveJSON('kahani_histories', histories);
+    saveJSON('kahani_last', lastMessages);
+    renderHome();
+    renderChatsList();
+
+    if (!activeChar || activeChar.id !== askedChar.id || document.hidden) {
+      unread[askedChar.id] = true;
+      saveJSON('kahani_unread', unread);
+      showToast(askedChar, reply);
+      sendNotification(askedChar, reply);
+    }
+  } catch (err) {
+    loadingBubble.textContent = "Connection error: " + err.message;
+    loadingBubble.classList.remove('loading');
+    loadingBubble.classList.add('error');
+  } finally {
+    sendBtn.disabled = false;
+  }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+input.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); sendMessage(); } });
+
+/* ---- Mic ↔ Send toggle: khaali ho to mic dikhe, kuch likha ho to send dikhe ---- */
+function updateSendMicToggle(){
+  if (input.value.trim().length > 0) {
+    micBtn.classList.add('hide');
+    sendBtn.classList.remove('hide');
+  } else {
+    micBtn.classList.remove('hide');
+    sendBtn.classList.add('hide');
+  }
+}
+input.addEventListener('input', updateSendMicToggle);
+updateSendMicToggle();
+
+/* ============================================================
+   MIC INPUT
+   ============================================================ */
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognizer = null, recording = false;
+
+if (SpeechRecognitionAPI) {
+  recognizer = new SpeechRecognitionAPI();
+  recognizer.lang = 'hi-IN';
+  recognizer.interimResults = false;
+  recognizer.maxAlternatives = 1;
+  recognizer.addEventListener('result', (e) => {
+    input.value = (input.value ? input.value + ' ' : '') + e.results[0][0].transcript;
+    updateSendMicToggle();
+  });
+  recognizer.addEventListener('end', () => { recording = false; micBtn.classList.remove('recording'); });
+  recognizer.addEventListener('error', () => { recording = false; micBtn.classList.remove('recording'); });
+} else {
+  micBtn.style.opacity = '0.4';
+}
+micBtn.addEventListener('click', () => {
+  if (!recognizer) { alert('Ye browser awaaz se likhna support nahi karta. Chrome try karo.'); return; }
+  if (recording) { recognizer.stop(); recording = false; micBtn.classList.remove('recording'); }
+  else { recognizer.start(); recording = true; micBtn.classList.add('recording'); }
+});
+
+/* ============================================================
+   TOAST + NOTIFICATIONS
+   ============================================================ */
+function showToast(ch, text){
+  document.getElementById('toastAvatar').style.background = ch.colors[0];
+  document.getElementById('toastAvatar').textContent = ch.initial;
+  document.getElementById('toastName').textContent = ch.name;
+  document.getElementById('toastText').textContent = text.slice(0,60) + (text.length > 60 ? '...' : '');
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+function sendNotification(ch, text){
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted' && document.hidden) {
+    new Notification(ch.name + " ne reply kiya", { body: text.slice(0,80) });
+  }
+}
+function refreshNotifStatus(){
+  if (!('Notification' in window)) { notifText.textContent = 'Ye browser notifications support nahi karta.'; notifBtn.style.display='none'; return; }
+  if (Notification.permission === 'granted') { notifText.textContent = 'Notifications: ON hain ✓'; notifBtn.style.display='none'; }
+  else if (Notification.permission === 'denied') { notifText.textContent = 'Notifications block hain (settings se on karo)'; notifBtn.style.display='none'; }
+  else { notifText.textContent = 'Notifications abhi off hain'; notifBtn.style.display='inline-block'; }
+}
+notifBtn.addEventListener('click', () => Notification.requestPermission().then(refreshNotifStatus));
+
+/* ============================================================
+   PROFILE — main screen
+   ============================================================ */
+const bigAvatar2 = document.getElementById('bigAvatar2');
+const phoneInput = document.getElementById('phoneInput');
+const profileDisplayName = document.getElementById('profileDisplayName');
+const profileDisplayPhone = document.getElementById('profileDisplayPhone');
+
+function renderColorRow(){
+  colorRow.innerHTML = '';
+  AVATAR_COLORS.forEach(c => {
+    const dot = document.createElement('div');
+    dot.className = 'colorDot' + (profile.color === c ? ' selected' : '');
+    dot.style.background = c;
+    dot.addEventListener('click', () => { profile.color = c; renderColorRow(); updateBigAvatar(); });
+    colorRow.appendChild(dot);
+  });
+}
+function updateBigAvatar(){
+  const letter = (profile.name || 'U').trim().charAt(0).toUpperCase();
+  bigAvatar.style.background = profile.color;
+  bigAvatar.textContent = letter;
+  bigAvatar2.style.background = profile.color;
+  bigAvatar2.textContent = letter;
+  profileDisplayName.textContent = profile.name || 'Tum';
+  profileDisplayPhone.textContent = profile.phone || '';
+}
+
+openProfile.addEventListener('click', () => {
+  updateBigAvatar();
+  openScreenClass('profile-open');
+});
+backFromProfile.addEventListener('click', () => history.back());
+
+/* ---- Profile Details (nested) ---- */
+document.getElementById('rowProfileDetails').addEventListener('click', () => {
+  nameInput.value = profile.name || '';
+  phoneInput.value = profile.phone || '';
+  renderColorRow();
+  openScreenClass('profile-details-open');
+});
+document.getElementById('backFromProfileDetails').addEventListener('click', () => history.back());
+saveProfileBtn.addEventListener('click', () => {
+  profile.name = nameInput.value.trim() || 'Tum';
+  profile.phone = phoneInput.value.trim();
+  saveJSON('kahani_profile', profile);
+  updateBigAvatar();
+  history.back();
+});
+nameInput.addEventListener('input', updateBigAvatar);
+
+/* ---- Manage Subscription (honest placeholder — no real payment backend yet) ---- */
+document.getElementById('manageSubBtn').addEventListener('click', () => {
+  alert('Abhi ye app free hai — koi payment system nahi laga hai.\n\nJab tum real subscription/paisa lena chaho, uske liye payment gateway (jaise Razorpay) aur ek server chahiye hoga.');
+});
+
+/* ---- Message History → reuse existing Chats list screen ---- */
+document.getElementById('rowMessageHistory').addEventListener('click', () => {
+  document.body.classList.remove('profile-open');
+  openChatsList(true);
+});
+
+/* ---- Purchase History (no real purchases since app is free) ---- */
+document.getElementById('rowPurchaseHistory').addEventListener('click', () => {
+  openInfo('Purchase History', '<div class="emptyState">Abhi koi purchase nahi hui hai.<br>Ye app filhaal poori tarah free hai.</div>');
+});
+
+/* ---- Rate us on Playstore ---- */
+document.getElementById('rowRateUs').addEventListener('click', () => {
+  alert('Jab ye app Playstore par live hogi, tab yahan seedha rating page khulega.');
+});
+
+/* ---- Support ---- */
+document.getElementById('rowSupport').addEventListener('click', () => {
+  openInfo('Support', `
+    <h4>Kisi bhi tarah ki madad chahiye?</h4>
+    <p>Agar koi dikkat aa rahi hai ya sujhaav dena hai, hume seedha sampark karo.</p>
+    <p>Apna support email ya WhatsApp number yahan code mein SUPPORT_CONTACT wali line mein daal do, taaki users tumse seedha juud sakein.</p>
+  `);
+});
+
+/* ---- FAQ ---- */
+document.getElementById('rowFaq').addEventListener('click', () => {
+  openInfo('FAQ', `
+    <h4>Ye app kaise kaam karti hai?</h4>
+    <p>Tum kisi bhi kirdaar ko chun kar uske saath Hindi mein kahani jaisi chat kar sakte ho.</p>
+    <h4>Kya ye free hai?</h4>
+    <p>Haan, abhi ye poori tarah free hai.</p>
+    <h4>Chat history delete kaise karu?</h4>
+    <p>Kisi bhi chat ke andar "Clear" button se, ya Profile → Account setting se sab ek saath mita sakte ho.</p>
+    <h4>Naya character kaise banau?</h4>
+    <p>Home screen ke grid mein sabse aakhir "+ Naya Character Banao" tile se.</p>
+  `);
+});
+
+/* ---- Terms of Service ---- */
+document.getElementById('rowTerms').addEventListener('click', () => {
+  openInfo('Terms of Service', `
+    <h4>Istemal ki shartein</h4>
+    <p>Ye app sirf manoranjan (entertainment) ke liye hai. Isme jo kirdaar hain wo kaal-panik (fictional) hain.</p>
+    <p>App ka galat istemal (jaise kisi ko pareshan karna) allowed nahi hai.</p>
+  `);
+});
+
+/* ---- Privacy Policy ---- */
+document.getElementById('rowPrivacy').addEventListener('click', () => {
+  openInfo('Privacy Policy', `
+    <h4>Tumhari jaankari kahan rehti hai</h4>
+    <p>Tumhara naam, photo aur chat history sirf tumhare hi phone mein save hoti hai — kisi server par nahi jaati.</p>
+    <p>Jab tum message bhejte ho, sirf wahi message AI (OpenRouter) ko bheja jaata hai reply generate karne ke liye.</p>
+    <h4>Safety System</h4>
+    <p>Tumhari normal chats kabhi kisi ko nahi dikhayi jaati aur na hi padhi jaati hain.</p>
+    <p>Lekin agar koi message threat, violence, ya illegal activity jaisa lage, to hamara automatic safety system usko flag kar sakta hai — sirf wahi specific conversation app ke admin ko safety aur legal compliance ke liye dikh sakti hai. Iska matlab hai ki sirf hadd paar karne wale messages hi review hote hain, baaki sab hamesha private rehta hai.</p>
+  `);
+});
+
+/* ---- Refund Policy ---- */
+document.getElementById('rowRefund').addEventListener('click', () => {
+  openInfo('Refund Policy', '<div class="emptyState">Ye app free hai, isliye koi payment nahi hoti — aur isliye koi refund bhi lagu nahi hota.</div>');
+});
+
+/* ---- Share App ---- */
+document.getElementById('rowShare').addEventListener('click', async () => {
+  const shareData = { title: 'Kahaniyon Chat Story', text: 'Ye AI story-chat app try karo!', url: window.location.href };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch(e) {}
+  } else {
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      alert('Link copy ho gaya hai — kahin bhi paste karke bhej do.');
+    } catch(e) {
+      alert('Link: ' + shareData.url);
+    }
+  }
+});
+
+/* ---- Account setting (nested) ---- */
+/* ---- Flagged Chats (Admin only) ---- */
+document.getElementById('rowFlagged').addEventListener('click', async () => {
+  openInfo('Flagged Chats', '<div class="emptyState">Load ho raha hai...</div>');
+  const list = await loadFlaggedChats();
+  if (!list.length) {
+    infoBody.innerHTML = '<div class="emptyState">Abhi tak koi chat flag nahi hui hai.<br>Jaise hi koi message safety-limit paar karega, wo yahan dikhega.</div>';
+    return;
+  }
+  infoBody.innerHTML = list.map(item => {
+    let historyHtml = '';
+    try {
+      const hist = JSON.parse(item.fullHistory || '[]');
+      historyHtml = hist.map(m => `<p><b>${m.role === 'user' ? (item.userName || 'User') : item.characterName}:</b> ${m.content}</p>`).join('');
+    } catch(e) {}
+    const when = item.timestamp && item.timestamp.toDate ? item.timestamp.toDate().toLocaleString() : '';
+    return `
+      <h4>🚩 ${item.characterName} — ${item.userName || 'Unknown'}</h4>
+      <p style="color:#E06B6B">Trigger: "${item.triggerText}"</p>
+      <p style="font-size:11px">${when}</p>
+      <div style="background:var(--panel-2);border-radius:10px;padding:10px;margin:8px 0 4px;">${historyHtml}</div>
+    `;
+  }).join('<hr style="border-color:var(--border);margin:16px 0;">');
+});
+
+document.getElementById('rowAccountSetting').addEventListener('click', () => {
+  openScreenClass('account-open');
+});
+document.getElementById('backFromAccount').addEventListener('click', () => history.back());
+document.getElementById('clearAllChatsBtn').addEventListener('click', () => {
+  if (!confirm('Sabhi characters ki poori chat history mita dein? Ye wapas nahi aa sakti.')) return;
+  histories = {};
+  lastMessages = {};
+  unread = {};
+  saveJSON('kahani_histories', histories);
+  saveJSON('kahani_last', lastMessages);
+  saveJSON('kahani_unread', unread);
+  renderHome();
+  alert('Sabhi chat history mit gayi hai.');
+});
+
+/* ---- Log out ---- */
+/* ---- Change Admin PIN - Using Input Sheet ---- */
+const rowChangePassword = document.getElementById('rowChangePassword');
+if (rowChangePassword) {
+  rowChangePassword.addEventListener('click', () => {
+    // Step 1: Ask for current PIN
+    linkUrlInput.value = '';
+    linkUrlInput.type = 'password';
+    linkUrlInput.placeholder = 'Current PIN likho';
+    linkInputSheet.querySelector('.sheetTitle').textContent = 'Current PIN Verify';
+    linkInputOverlay.classList.add('show');
+    linkInputOverlay.dataset.mode = 'verify-pin';
+    setTimeout(() => linkUrlInput.focus(), 200);
+  });
+}
+
+document.getElementById('rowTheme').addEventListener('click', () => {
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+  alert(`Theme change ho gaya: ${newTheme === 'dark' ? '🌙 Dark' : '☀️ Light'}`);
+});
+
+document.getElementById('rowLogout').addEventListener('click', () => {
+  if (!confirm('Log out karna hai? Naam dobara puchha jaayega (chat history surakshit rahegi).')) return;
+  saveJSON('kahani_onboarded', false);
+  document.body.classList.remove('profile-open');
+  loginNameInput.value = '';
+  loginScreen.style.display = 'flex';
+});
+
+/* ---- Generic Info Screen (FAQ, Terms, Privacy, Refund, Support, Purchase History) ---- */
+const infoScreen = document.getElementById('infoScreen');
+const infoTitle = document.getElementById('infoTitle');
+const infoBody = document.getElementById('infoBody');
+function openInfo(title, html){
+  infoTitle.textContent = title;
+  infoBody.innerHTML = html;
+  openScreenClass('info-open');
+}
+document.getElementById('backFromInfo').addEventListener('click', () => history.back());
+
+/* ============================================================
+   CHARACTER CREATOR
+   ============================================================ */
+const backFromCreate = document.getElementById('backFromCreate');
+const newCharName = document.getElementById('newCharName');
+const newCharTitle = document.getElementById('newCharTitle');
+const newCharGenre = document.getElementById('newCharGenre');
+const newCharDesc = document.getElementById('newCharDesc');
+const newCharPersonality = document.getElementById('newCharPersonality');
+const newCharPhotoBtn = document.getElementById('newCharPhotoBtn');
+const newCharPhotoPreview = document.getElementById('newCharPhotoPreview');
+const saveCharBtn = document.getElementById('saveCharBtn');
+
+const createScreenTitle = document.getElementById('createScreenTitle');
+let editingCharId = null;
+
+newCharPhotoBtn.addEventListener('click', () => openPhotoPicker('NEW_CHAR'));
+
+function openCreateScreen(charToEdit){
+  if (charToEdit) {
+    editingCharId = charToEdit.id;
+    createScreenTitle.textContent = charToEdit.name + ' Edit Karo';
+    newCharName.value = charToEdit.name || '';
+    newCharTitle.value = charToEdit.title || '';
+    newCharGenre.value = charToEdit.genre || '';
+    newCharDesc.value = charToEdit.desc || '';
+    // persona ka pehla hissa hi dikhate hain (jo user ne likha tha), niyam wala hissa nahi
+    const p = charToEdit.personality || charToEdit.persona || '';
+    newCharPersonality.value = charToEdit.personality || p.split('ZAROORI NIYAM')[0].replace(/^Tum .*? ho — .*?\. Iska swabhav: /,'').trim();
+    const existingPhoto = charPhotos[charToEdit.id];
+    if (existingPhoto) {
+      newCharPhotoData = existingPhoto;
+      newCharPhotoPreview.style.backgroundImage = `url('${existingPhoto}')`;
+      newCharPhotoPreview.textContent = '';
+    } else {
+      newCharPhotoData = null;
+      newCharPhotoPreview.style.backgroundImage = '';
+      newCharPhotoPreview.textContent = '📷';
+    }
+  } else {
+    editingCharId = null;
+    createScreenTitle.textContent = 'Naya Character Banao';
+    newCharName.value = '';
+    newCharTitle.value = '';
+    newCharGenre.value = '';
+    newCharDesc.value = '';
+    newCharPersonality.value = '';
+    newCharPhotoData = null;
+    newCharPhotoPreview.style.backgroundImage = '';
+    newCharPhotoPreview.textContent = '📷';
+  }
+  openScreenClass('create-open');
+}
+backFromCreate.addEventListener('click', () => history.back());
+
+saveCharBtn.addEventListener('click', () => {
+  const name = newCharName.value.trim();
+  const title = newCharTitle.value.trim();
+  const genre = newCharGenre.value.trim() || 'Original';
+  const desc = newCharDesc.value.trim();
+  const personality = newCharPersonality.value.trim();
+
+  if (!name || !title || !desc || !personality) {
+    alert('Sab fields bharo — naam, title, kahani aur swabhav, tabhi character ban payega.');
+    return;
+  }
+
+  const persona = `Tum ${name} ho — ${desc}. Iska swabhav: ${personality}.
+
+ZAROORI NIYAM: Upar jo bhi likha gaya hai (naam, kahani, swabhav), usse HU-BA-HU follow karo — bilkul mat badlo, mat todo, apni taraf se kuch alag mat banao. Jo bhi character ki baat/soch/tareeka upar bataya gaya hai, wahi exactly nibhao jaise likha gaya hai.
+
+Tum Hindi mein baat karte ho, chhote replies dete ho (3-5 lines), aur user ke jawab se kahani aage badhate ho. Kabhi mat batao ki tum AI ho.`;
+
+  if (editingCharId) {
+    // Existing character update ho raha hai (built-in ya custom, dono)
+    const updatedFields = { name, title, kicker: genre, desc, genre, persona, personality };
+    const customIdx = customCharacters.findIndex(c => c.id === editingCharId);
+
+    if (customIdx !=

@@ -1,0 +1,32 @@
+{
+  "background_color": "#0F0B08",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Kahaniyon Chat Story",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "short_name": "Kahaniyon",
+  "start_url": "/",
+  "theme_color": "#0F0B08",
+  "description": "Apni kahaniyon ki duniya mein AI ke saath baat karo",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}
